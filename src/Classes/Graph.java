@@ -36,12 +36,11 @@ public class Graph {
     public void display() {
         p.pushStyle();
 
-        // marco
         p.noFill();
         p.stroke(255);
         p.rect(x, y, w, h);
 
-        // ----- línea roja discontinua en y = 0 -----
+
         if (minY < 0 && maxY > 0) {
             float yZero = p.map(0, minY, maxY, y + h, y);
 
