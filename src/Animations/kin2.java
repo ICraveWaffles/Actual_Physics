@@ -27,6 +27,7 @@ public class kin2 {
     public void update(float beats) {
 
         w1.update();
+        w1.update();
 
         gPos.actualizar(w1.phi % PApplet.TWO_PI);
         gVel.actualizar(w1.omega);

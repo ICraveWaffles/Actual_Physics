@@ -31,6 +31,7 @@ public class kin1 {
     public void update(float beats) {
 
         b1.update();
+        b1.update();
 
         if (beatOne && !beatTwo) {
             gVel.actualizar(2 * b1.vy);
