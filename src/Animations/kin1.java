@@ -1,5 +1,6 @@
 package Animations;
 
+import Classes.Arrow;
 import Classes.Block;
 import Classes.Graph;
 import processing.core.PApplet;
@@ -19,6 +20,8 @@ public class kin1 {
     Graph gVel;
     Graph gAcc;
 
+    Arrow vx, vy, vxy;
+
     public kin1(PApplet p) {
 
         b1 = new Block(200, 900, 11, 0, 0, 0, 50, 50, 1);
@@ -26,6 +29,8 @@ public class kin1 {
         gPos = new Graph(p, 50, 50, 400, 150, 300, 0, 1500);
         gVel = new Graph(p, 530, 50, 400, 150, 300, -32, 32);
         gAcc = new Graph(p, 1010, 50, 400, 150, 300, -0.2f, 0.2f);
+
+
     }
 
     public void update(float beats) {
