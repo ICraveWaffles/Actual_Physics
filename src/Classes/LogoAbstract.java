@@ -49,7 +49,19 @@ public class LogoAbstract {
             case 'E':
                 drawE(p5, t);
                 break;
+
+            case 'I':
+                drawI(p5);
+                break;
+
+            case 'X':
+                drawX(p5, t);
+                break;
         }
+
+        p5.stroke(255,0,0);
+        p5.noFill();
+        p5.rect(x, y, w, h);
 
         p5.popStyle();
     }
@@ -164,6 +176,7 @@ public class LogoAbstract {
     }
 
     private void drawE(PApplet p5, float t) {
+
         p5.noFill();
         p5.stroke(255);
         p5.strokeWeight(2);
@@ -178,14 +191,129 @@ public class LogoAbstract {
             float xNorm = (i / w) * L - 6f + shift;
 
             float yVal = (float)(
-                    Math.exp(-Math.pow(xNorm + 0.01*i, 2)) *
+                    Math.exp(-Math.pow(xNorm + 0.01f*i, 2)) *
                             Math.sin(10 * xNorm)
             );
 
-            p5.vertex(x + i, y - yVal * h/2);
+            float px = x - w/2f + i;
+
+            float py = y - yVal * h/2f;
+
+            p5.vertex(px, py);
         }
 
         p5.endShape();
+    }
+
+    private void drawI(PApplet p5){
+
+        p5.pushStyle();
+
+
+        float px = x + w/50f * p5.random(-1, 1);
+        float py = y + h/50f * p5.random(-1, 1);
+        float errX = p5.random(w/8f, w/2f);
+        float errY = p5.random(h/8f, h/2f);
+        float left   = Math.max(x - errX, x - w/2f);
+        float right  = Math.min(x + errX, x + w/2f);
+        float top    = Math.max(y - errY, y - h/2f);
+        float bottom = Math.min(y + errY, y + h/2f);
+
+
+        p5.stroke(255);
+        p5.strokeWeight(2);
+        p5.noFill();
+
+        p5.line(left, py, right, py);
+
+        p5.line(px, top, px, bottom);
+
+        float cap = w/30f;
+
+        p5.line(left,  py - cap, left,  py + cap);
+        p5.line(right, py - cap, right, py + cap);
+
+        p5.line(px - cap, top,    px + cap, top);
+        p5.line(px - cap, bottom, px + cap, bottom);
+
+
+        p5.noStroke();
+        p5.fill(255);
+
+        for(int i = 0; i < 10; i++){
+
+            float sx = p5.random(left, right);
+            float sy = p5.random(top, bottom);
+
+            p5.circle(sx, sy, w/35f);
+        }
+
+        p5.fill(255);
+        p5.circle(px, py, w/10f);
+
+        p5.popStyle();
+    }
+
+    private void drawX(PApplet p5, float t){
+
+        p5.pushStyle();
+
+        float ropeLength = w * 0.9f;
+        float waveAmp = h * 0.1f;
+
+        float leftX = x - ropeLength/2f;
+        float rightX = x + ropeLength/2f;
+
+        float phase = t * 5f;
+
+        p5.noFill();
+        p5.stroke(255);
+        p5.strokeWeight(3);
+
+        p5.beginShape();
+
+        for(float i = 0; i <= 1; i += 0.02f){
+
+            float px = p5.lerp(leftX, rightX, i);
+
+            float py =
+                    y
+                            + waveAmp * (float)Math.sin(i * 20 + phase)
+                            + waveAmp * 0.4f * (float)Math.sin(i * 55 + phase * 1.7f);
+
+            p5.vertex(px, py);
+        }
+
+        p5.endShape();
+
+        p5.strokeWeight(1);
+
+        for(float i = 0; i <= 1; i += 0.05f){
+
+            float px = p5.lerp(leftX, rightX, i);
+
+            float offset =
+                    waveAmp * 0.8f *
+                            (float)Math.sin(i * 30 + phase);
+
+            p5.line(px, y - offset, px + h*0.01f, y + offset);
+        }
+
+
+        p5.rectMode(p5.CENTER);
+
+        p5.strokeWeight(w/20f);
+        p5.stroke(255);
+
+        p5.line(x - w/2.2f, y+h/2.5f, x - w/2.33f, y-h/2.5f);
+        p5.line(x + w/2.33f, y+h/2.5f, x + w/2.2f, y-h/2.5f);
+
+        p5.stroke(0);
+        p5.strokeWeight(1);
+
+
+
+        p5.popStyle();
     }
 
     private void drawArrow(PApplet p5, float size) {
