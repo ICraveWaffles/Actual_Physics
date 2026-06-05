@@ -26,13 +26,18 @@ public class logoTests extends PApplet {
         background(0);
         float t = w * frameCount / (float) fps;
 
-        a.display(this, t);
-        b.display(this, t);
-        c.display(this, t);
-        e1.display(this, t);
-        e2.display(this, t);
-        ie.display(this, t);
-        ee.display(this, t);
+        float transX = t % 1.25f;
+        float transY = t % 1f;
+        float logoTransparency = (float) (255 * (-Math.pow(transX, 2) + 2*(transX)));
+
+        a.display(this, t, logoTransparency);
+        b.display(this, t, logoTransparency);
+        c.display(this, t, logoTransparency);
+        e1.display(this, t, logoTransparency);
+        e2.display(this, t, logoTransparency);
+        ie.display(this, t, logoTransparency);
+        ee.display(this, t, logoTransparency);
+
     }
 
     public void settings(){

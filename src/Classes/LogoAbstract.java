@@ -6,7 +6,7 @@ public class LogoAbstract {
 
     public float x, y, w, h;
     float d;
-    char b;
+    public char b;
 
     public LogoAbstract(float x, float y, float w, float h) {
         this.x = x;
@@ -17,63 +17,66 @@ public class LogoAbstract {
         this.b = '8';
     }
 
-    public void display(PApplet p5, float t) {
+    public void display(PApplet p5, float t, float trans) {
         p5.pushStyle();
 
         p5.rectMode(p5.CENTER);
         p5.noStroke();
-        p5.fill(255);
+        p5.fill(trans);
 
         switch (b) {
 
             case '8':
-                drawBase(p5, t);
+                drawBase(p5, t, trans);
                 break;
 
             case 'A':
-                drawA(p5, t);
+                drawA(p5, t, trans);
                 break;
 
             case 'B':
-                drawB(p5, t);
+                drawB(p5, t, trans);
                 break;
 
             case 'C':
-                drawC(p5, t);
+                drawC(p5, t, trans);
                 break;
 
             case 'D':
-                drawD(p5, t);
+                drawD(p5, t, trans);
                 break;
 
             case 'E':
-                drawE(p5, t);
+                drawE(p5, t, trans);
                 break;
 
             case 'I':
-                drawI(p5);
+                drawI(p5, trans);
                 break;
 
             case 'X':
-                drawX(p5, t);
+                drawX(p5, t, trans);
                 break;
         }
-
-        p5.stroke(255,0,0);
-        p5.noFill();
-        p5.rect(x, y, w, h);
 
         p5.popStyle();
     }
 
-    private void drawBase(PApplet p5, float t) {
+    private void drawBase(PApplet p5, float t, float trans) {
         float scaleX = (float) (1 + 0.5 * Math.sin(t));
         float scaleY = (float) (1 - 0.5 * Math.sin(t));
+
+        p5.stroke(trans);
+        p5.fill(trans);
 
         p5.rect(x, y, w * scaleX, h * scaleY);
     }
 
-    private void drawA(PApplet p5, float t) {
+    private void drawA(PApplet p5, float t, float trans) {
+
+        p5.stroke(trans);
+        p5.fill(trans);
+
         p5.triangle(x - 0.25f * w, y - 0.5f * h,
                 x, y + 0.5f * h,
                 x - 0.5f * w, y + 0.5f * h);
@@ -83,7 +86,7 @@ public class LogoAbstract {
                 x - 0.25f * w, y + 0.45f * h,
                 x - 0.45f * w, y + 0.45f * h);
 
-        p5.fill(255);
+        p5.fill(trans);
 
         float s = 0.1f * w * sin99(t);
 
@@ -102,9 +105,9 @@ public class LogoAbstract {
         p5.endShape(p5.CLOSE);
     }
 
-    private void drawB(PApplet p5, float t) {
+    private void drawB(PApplet p5, float t, float trans) {
         p5.noFill();
-        p5.stroke(255);
+        p5.stroke(trans);
 
         p5.rect(x, y, w, h);
 
@@ -123,27 +126,27 @@ public class LogoAbstract {
         }
     }
 
-    private void drawC(PApplet p5, float t) {
+    private void drawC(PApplet p5, float t, float trans) {
         p5.noFill();
         p5.strokeWeight(15);
 
         float baseCol = (float)(127 * Math.sin(t) + 127);
 
         for (int i = 15; i < w; i += 15) {
-            p5.stroke(baseCol);
+            p5.stroke(baseCol, trans);
             p5.circle(x, y, i);
 
             baseCol = (float)(127 * Math.sin(Math.PI * t + i / 15f) + 127);
         }
     }
 
-    private void drawD(PApplet p5, float t) {
-        p5.fill(255);
+    private void drawD(PApplet p5, float t, float trans) {
+        p5.fill(trans);
         p5.noStroke();
         p5.circle(x, y, w / 15f);
 
         p5.noFill();
-        p5.stroke(255);
+        p5.stroke(trans);
 
         float[] scales = {1f, 1.5f, 2f, 2.5f, 3f, 3.5f};
         for (float s : scales) {
@@ -169,16 +172,17 @@ public class LogoAbstract {
             p5.translate(px, py);
             p5.rotate(angle + (float)Math.PI);
 
-            drawArrow(p5, 10);
+            drawArrow(p5, 10, trans);
 
             p5.popMatrix();
         }
     }
 
-    private void drawE(PApplet p5, float t) {
+    private void drawE(PApplet p5, float t, float trans) {
 
         p5.noFill();
-        p5.stroke(255);
+        p5.stroke(trans);
+        p5.fill(trans);
         p5.strokeWeight(2);
 
         float L = 10f;
@@ -205,10 +209,9 @@ public class LogoAbstract {
         p5.endShape();
     }
 
-    private void drawI(PApplet p5){
+    private void drawI(PApplet p5, float trans){
 
         p5.pushStyle();
-
 
         float px = x + w/50f * p5.random(-1, 1);
         float py = y + h/50f * p5.random(-1, 1);
@@ -220,7 +223,8 @@ public class LogoAbstract {
         float bottom = Math.min(y + errY, y + h/2f);
 
 
-        p5.stroke(255);
+        p5.stroke(trans);
+        p5.fill(trans);
         p5.strokeWeight(2);
         p5.noFill();
 
@@ -238,7 +242,7 @@ public class LogoAbstract {
 
 
         p5.noStroke();
-        p5.fill(255);
+        p5.fill(trans);
 
         for(int i = 0; i < 10; i++){
 
@@ -248,13 +252,13 @@ public class LogoAbstract {
             p5.circle(sx, sy, w/35f);
         }
 
-        p5.fill(255);
+        p5.fill(trans);
         p5.circle(px, py, w/10f);
 
         p5.popStyle();
     }
 
-    private void drawX(PApplet p5, float t){
+    private void drawX(PApplet p5, float t, float trans){
 
         p5.pushStyle();
 
@@ -267,7 +271,7 @@ public class LogoAbstract {
         float phase = t * 5f;
 
         p5.noFill();
-        p5.stroke(255);
+        p5.stroke(trans);
         p5.strokeWeight(3);
 
         p5.beginShape();
@@ -316,8 +320,8 @@ public class LogoAbstract {
         p5.popStyle();
     }
 
-    private void drawArrow(PApplet p5, float size) {
-        p5.fill(255);
+    private void drawArrow(PApplet p5, float size, float trans) {
+        p5.fill(trans);
         p5.noStroke();
 
         p5.beginShape();
