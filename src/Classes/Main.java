@@ -14,29 +14,49 @@ public class Main extends PApplet {
     float transX;
     float transY;
 
-    LogoAbstract alogo;
+    public static LogoAbstract alogo;
 
     char[] logoTypes = {'A', 'B', 'C', 'D', 'E', 'I', 'X'};
 
-    public void draw(){
+    boolean logoIntroMove = true;
+
+    public void draw() {
+
         frameRate = 30;
         background(0);
-        float b = (frameCount/frameRate) * w;
+        float b = (frameCount / frameRate) * w;
         textFont(ntr);
 
         transX = b % 1.25f;
         transY = b % 1f;
-        logoTransparency = (float) (255 * (-Math.pow(transX, 2) + 2*(transX)));
-
-
+        logoTransparency = (float) (255 * (-Math.pow(transX, 2) + 2 * (transX)));
 
         fill(logoTransparency);
-        text(alogo.b +" P H Y S I C S "+ b, 1000, 500);
-        int index = ((int)(b / 1.25f)) % logoTypes.length;
+        text(alogo.b + " P H Y S I C S " + b, 1000, 500);
+        int index = ((int) (b / 1.25f)) % logoTypes.length;
         alogo.b = logoTypes[index];
         alogo.display(this, b, logoTransparency);
         fill(255);
         text("FPS: " + frameRate, 50, 50);
+
+        if (b > 32.5f){
+            logoIntroMove = true;
+        } else if (b > 17.5f && logoIntroMove) {
+            logoIntroMove = false;
+        }
+
+        if (!logoIntroMove) {
+            alogo.x += 1.7f;
+            alogo.y -= 0.9f;
+            alogo.w -= 0.75f;
+            alogo.h -= 0.75f;
+        }
+
+        if (b > 17.5f){
+            logoIntroMove = true;
+        }
+
+
     }
 
     public void settings() {
