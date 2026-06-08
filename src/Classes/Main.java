@@ -16,6 +16,8 @@ public class Main extends PApplet {
 
     public static LogoAbstract alogo;
 
+    public static Phone phone;
+
     char[] logoTypes = {'A', 'B', 'C', 'D', 'E', 'I', 'X'};
 
     boolean logoIntroMove = true;
@@ -29,11 +31,11 @@ public class Main extends PApplet {
 
         transX = b % 1.25f;
         transY = b % 1f;
-        logoTransparency = (float) (255 * (-Math.pow(transX, 2) + 2 * (transX)));
+        logoTransparency = (float) (255 * (-Math.pow(b < 32? transX : transY, 2) + 2 * (b < 32? transX : transY)));
 
         fill(logoTransparency);
         text(alogo.b + " P H Y S I C S " + b, 1000, 500);
-        int index = ((int) (b / 1.25f)) % logoTypes.length;
+        int index = ((int) (b / (b < 32 ? 1.25f : 1f))) % logoTypes.length;
         alogo.b = logoTypes[index];
         alogo.display(this, b, logoTransparency);
         fill(255);
@@ -56,6 +58,22 @@ public class Main extends PApplet {
             logoIntroMove = true;
         }
 
+        if (b > 32 && b < 64){
+            float beatInCycle = b % 4f;
+
+            int phase = 0;
+
+            if (beatInCycle < 1f) {
+                phase = (int)(beatInCycle * 8);
+            }
+
+            phone.display(this, phase);
+
+            rectMode(CENTER);
+            fill(255, 255 - (255 * (b - 32)));
+            rect(phone.x, phone.y, phone.w * 1.03f, phone.h * 1.03f, 50);
+        }
+
 
     }
 
@@ -67,6 +85,7 @@ public class Main extends PApplet {
     public void setup(){
         ntr = createFont("times.ttf", 50);
         alogo = new LogoAbstract(width/2f, height/2f, height/2f, height/2f);
+        phone = new Phone();
     }
 
     public static void main(String[] args) {
