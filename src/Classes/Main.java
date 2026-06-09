@@ -36,12 +36,12 @@ public class Main extends PApplet {
         logoTransparency = (float) (255 * (-Math.pow(b < 32? transX : transY, 2) + 2 * (b < 32? transX : transY)));
 
         fill(logoTransparency);
-        text(alogo.b + " P H Y S I C S ", 1000, 500);
+        //text(alogo.b + " P H Y S I C S ", 1000, 500);
         int index = ((int) (b / (b < 32 ? 1.25f : 1f))) % logoTypes.length;
         alogo.b = logoTypes[index];
         alogo.display(this, b, logoTransparency);
         fill(255);
-        text("FPS: " + frameRate, 50, 50);
+        //text("FPS: " + frameRate, 50, 50);
 
         if (b > 32.5f){
             logoIntroMove = true;
@@ -102,10 +102,16 @@ public class Main extends PApplet {
         ntr = createFont("times.ttf", 50);
         alogo = new LogoAbstract(width/2f, height/2f, height/2f, height/2f);
         phone = new Phone();
+        noCursor();
     }
 
     public static void main(String[] args) {
         PApplet.main("Classes.Main");
+    }
+
+    public void mousePressed(){
+        t = 0;
+        frameCount = 0;
     }
 
 }
