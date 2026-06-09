@@ -24,6 +24,8 @@ public class Main extends PApplet {
 
     public void draw() {
 
+        pushStyle();
+
         frameRate = 30;
         background(0);
         float b = (frameCount / frameRate) * w;
@@ -34,7 +36,7 @@ public class Main extends PApplet {
         logoTransparency = (float) (255 * (-Math.pow(b < 32? transX : transY, 2) + 2 * (b < 32? transX : transY)));
 
         fill(logoTransparency);
-        text(alogo.b + " P H Y S I C S " + b, 1000, 500);
+        text(alogo.b + " P H Y S I C S ", 1000, 500);
         int index = ((int) (b / (b < 32 ? 1.25f : 1f))) % logoTypes.length;
         alogo.b = logoTypes[index];
         alogo.display(this, b, logoTransparency);
@@ -72,9 +74,23 @@ public class Main extends PApplet {
             rectMode(CENTER);
             fill(255, 255 - (255 * (b - 32)));
             rect(phone.x, phone.y, phone.w * 1.03f, phone.h * 1.03f, 50);
+
+
+            stroke(255);
+            strokeWeight(5);
+
+
+            float progress = constrain(b % 4f, 0, 1);
+
+            float startY = height / 9f;
+            float endY = lerp(startY, height / 1.1f, progress);
+
+            line(width/2.15f, startY, width/2f, startY);
+            line(width/2f, startY, width/2f, endY);
+            line(width/2.15f, endY, width/2f, endY);
         }
 
-
+        popStyle();
     }
 
     public void settings() {
