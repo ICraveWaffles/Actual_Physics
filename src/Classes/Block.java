@@ -29,7 +29,6 @@ public class Block {
         this.vy -= this.ay;
         this.x += this.vx;
         this.y += this.vy;
-
     }
 
     public void display(PApplet p5){
