@@ -8,7 +8,7 @@ public class Kin1 extends PApplet {
     int beat = 0;
     float t = 0;
 
-    float w = 106 / 120f;
+    float w = 5/6f;
     PFont ntr;
     float logoTransparency;
     float transX;

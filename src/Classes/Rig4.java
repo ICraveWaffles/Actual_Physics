@@ -8,7 +8,7 @@ import java.util.Collections;
 public class Rig4 extends PApplet {
 
     float t = 0;
-    float w = 106 / 120f;
+    float w = 5/6f;
     PFont ntr;
     float logoTransparency;
     float transY;

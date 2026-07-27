@@ -8,7 +8,8 @@ public class Main extends PApplet {
     int beat = 0;
     float t = 0;
 
-    float w = 106 / 120f;
+
+    float w = 5/6f;
     PFont ntr;
     float logoTransparency;
     float transX;
@@ -36,28 +37,18 @@ public class Main extends PApplet {
         logoTransparency = (float) (255 * (-Math.pow(b < 32? transX : transY, 2) + 2 * (b < 32? transX : transY)));
 
         fill(logoTransparency);
-        //text(alogo.b + " P H Y S I C S ", 1000, 500);
         int index = ((int) (b / (b < 32 ? 1.25f : 1f))) % logoTypes.length;
         alogo.b = logoTypes[index];
         alogo.display(this, b, logoTransparency);
-        fill(255);
-        //text("FPS: " + frameRate, 50, 50);
 
-        if (b > 32.5f){
-            logoIntroMove = true;
-        } else if (b > 17.5f && logoIntroMove) {
-            logoIntroMove = false;
-        }
+        logoIntroMove = (b < 17.5f || b > 32.5f);
 
         if (!logoIntroMove) {
-            alogo.x += 1.7f;
-            alogo.y -= 0.9f;
-            alogo.w -= 0.75f;
-            alogo.h -= 0.75f;
-        }
-
-        if (b > 17.5f){
-            logoIntroMove = true;
+            float ff = w / (106f / 120f);
+            alogo.x += 1.7f * ff;
+            alogo.y -= 0.9f * ff;
+            alogo.w -= 0.75f * ff;
+            alogo.h -= 0.75f * ff;
         }
 
         if (b > 32 && b < 64){
@@ -75,10 +66,8 @@ public class Main extends PApplet {
             fill(255, 255 - (255 * (b - 32)));
             rect(phone.x, phone.y, phone.w * 1.03f, phone.h * 1.03f, 50);
 
-
             stroke(255);
             strokeWeight(5);
-
 
             float progress = constrain(b % 4f, 0, 1);
 
@@ -113,5 +102,4 @@ public class Main extends PApplet {
         t = 0;
         frameCount = 0;
     }
-
 }
