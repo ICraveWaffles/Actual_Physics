@@ -52,6 +52,7 @@ public class Kin3 extends PApplet {
         drawLaunchAngle(startX, startY, 45);
 
         drawProgressiveParabola(startX, endX, startY, peakY, animT);
+        drawProgressiveFrictionPath(startX, endX, startY, peakY, animT);
 
         if (animT >= halfT / 2f) {
             float peakX = getParabolaX(halfT / 2f, startX, endX);
@@ -88,6 +89,44 @@ public class Kin3 extends PApplet {
         noStroke();
         circle(px, py, 14);
 
+        float fPx = getFrictionX(animT, startX, endX);
+        float fPy = getFrictionY(animT, startY, peakY);
+
+        float dt = 0.01f;
+        float fPx_next = getFrictionX(animT + dt, startX, endX);
+        float fPy_next = getFrictionY(animT + dt, startY, peakY);
+        float fVx = (fPx_next - fPx) / dt;
+        float fVy = (fPy_next - fPy) / dt;
+
+        float fSpeed = sqrt(fVx * fVx + fVy * fVy);
+        float dirX = (fSpeed > 0.001f) ? (fVx / fSpeed) : 0;
+        float dirY = (fSpeed > 0.001f) ? (fVy / fSpeed) : 0;
+
+        float fgX = 0;
+        float fgY = 55;
+
+        float dragMag = fSpeed * 0.32f;
+        float fdX = -dirX * dragMag;
+        float fdY = -dirY * dragMag;
+
+        float fnetX = fgX + fdX;
+        float fnetY = fgY + fdY;
+
+        float forceScale = 0.8f;
+        drawVector(fPx, fPy, fPx - fnetX * forceScale, fPy, 150);
+        drawVector(fPx, fPy, fPx, fPy - fnetY * forceScale, 150);
+        drawVector(fPx, fPy, fPx - fnetX * forceScale, fPy - fnetY * forceScale, 220);
+        drawDashedLine(fPx - fnetX * forceScale, fPy, fPx - fnetX * forceScale, fPy - fnetY * forceScale, 6, 6);
+        drawDashedLine(fPx, fPy - fnetY * forceScale, fPx - fnetX * forceScale, fPy - fnetY * forceScale, 6, 6);
+
+        fill(150, 200, 255);
+        noStroke();
+        rectMode(CENTER);
+        pushMatrix();
+        translate(fPx, fPy);
+        rect(0, 0, 14, 14);
+        popMatrix();
+
         popStyle();
     }
 
@@ -99,6 +138,18 @@ public class Kin3 extends PApplet {
     float getParabolaY(float time, float y0, float yPeak) {
         float normT = time / halfT;
         float h = y0 - yPeak;
+        return y0 - 4 * h * normT * (1f - normT);
+    }
+
+    float getFrictionX(float time, float x0, float x1) {
+        float normT = time / halfT;
+        float adjustedNormT = (float)((1.0 - Math.exp(-0.8 * normT)) / (1.0 - Math.exp(-0.8)));
+        return lerp(x0, x1 * 0.85f, adjustedNormT);
+    }
+
+    float getFrictionY(float time, float y0, float yPeak) {
+        float normT = time / halfT;
+        float h = (y0 - yPeak) * 0.8f;
         return y0 - 4 * h * normT * (1f - normT);
     }
 
@@ -126,6 +177,25 @@ public class Kin3 extends PApplet {
 
         float endPx = getParabolaX(currentAnimT, x0, x1);
         float endPy = getParabolaY(currentAnimT, y0, yPeak);
+        vertex(endPx, endPy);
+
+        endShape();
+    }
+
+    void drawProgressiveFrictionPath(float x0, float x1, float y0, float yPeak, float currentAnimT) {
+        stroke(100, 160, 255, 180);
+        strokeWeight(2);
+        noFill();
+
+        beginShape();
+        for (float step = 0; step <= currentAnimT; step += 0.02f) {
+            float px = getFrictionX(step, x0, x1);
+            float py = getFrictionY(step, y0, yPeak);
+            vertex(px, py);
+        }
+
+        float endPx = getFrictionX(currentAnimT, x0, x1);
+        float endPy = getFrictionY(currentAnimT, y0, yPeak);
         vertex(endPx, endPy);
 
         endShape();

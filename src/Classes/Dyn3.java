@@ -35,11 +35,9 @@ public class Dyn3 extends PApplet {
         logoTransparency = (float) (255 * (-Math.pow(transY, 2) + 2 * (transY)));
         alogo.display(this, b, logoTransparency);
 
-        // ==========================================
-        // GEOMETRÍA Y PARÁMETROS FÍSICOS (Idénticos a Dyn2 para Raccord Exacto)
-        // ==========================================
-        float theta = PI / 6f; // 30 grados
-        float S = 70; // Tamaño del bloque
+
+        float theta = PI / 6f;
+        float S = 70;
 
         float groundY = height * 0.82f;
         float startX = width * 0.08f;
@@ -59,7 +57,6 @@ public class Dyn3 extends PApplet {
         float v0y_air_orig = -v_top * sin(theta);
         float v0y_air = v0y_air_orig * vScale;
 
-        // Contenedor de agua (alineado píxel a píxel con Dyn2)
         float tankRight = width * 0.84f;
         float tankLeft = rampEndX + 60;
         float tankTop = rampEndY - 50;
@@ -69,43 +66,34 @@ public class Dyn3 extends PApplet {
         float tankLeftX = tankLeft - 100;
         float tankRightX = tankRight - 100;
 
-        // ==========================================
-        // ESTADO FINAL EXACTO DE DYN2 (b = 4.0 de Dyn2)
-        // ==========================================
         float dt_end_dyn2 = 1.0f;
         float px_init = rampEndX + v0x_air * dt_end_dyn2;
         float py_init = rampEndY + (v0y_air_orig * dt_end_dyn2 + 0.5f * g_orig * dt_end_dyn2 * dt_end_dyn2) * vScale;
         float vy_init = v0y_air + (g_orig * vScale) * dt_end_dyn2;
 
-        // ==========================================
-        // FÍSICA DE DESACELERACIÓN EXTREMA (Fricción masiva de fluidos)
-        // ==========================================
         float py_target = waterSurfaceY + 60;
         float px = px_init + v0x_air * b * 0.2f;
 
         float py, vy;
-        float b_stop = 1.2f; // El bloque frena de golpe casi al instante de entrar al agua
+        float b_stop = 1.2f;
 
         if (b <= b_stop) {
             float p = b / b_stop;
-            // Frenado brusco y pesado por fricción extrema (ease-out cúbico agresivo)
+
             float ease = 1.0f - (float)Math.pow(1.0f - p, 3.0f);
             float maxPenetration = py_init + vy_init * 0.35f;
             py = lerp(py_init, maxPenetration, ease);
-            vy = vy_init * (1.0f - p * p); // La velocidad cae verticalmente a cero de forma drástica
+            vy = vy_init * (1.0f - p * p);
         } else {
-            // Ascenso extremadamente lento y viscoso debido a la alta fricción remanente
             float p = (b - b_stop) / (4.0f - b_stop);
             float ease = p * p;
             float maxPenetration = py_init + vy_init * 0.35f;
             py = lerp(maxPenetration, py_target, ease);
-            vy = lerp(0.0f, -25.0f, p); // Subida muy pesada
+            vy = lerp(0.0f, -25.0f, p);
         }
         float v_mag = abs(vy);
 
-        // ==========================================
-        // DIBUJO DEL ENTORNO
-        // ==========================================
+
         stroke(255);
         strokeWeight(5);
         line(0, groundY, width, groundY);
@@ -116,18 +104,18 @@ public class Dyn3 extends PApplet {
             line(x, groundY, x + 180, groundY);
         }
 
-        // Cuerpo de Agua Translúcido
+
         noStroke();
         fill(0, 140, 230, 130);
         rectMode(CORNER);
         rect(tankLeftX + 3, waterSurfaceY, (tankRightX - tankLeftX) - 6, waterH);
 
-        // Línea de Superficie del Agua
+
         stroke(0, 200, 255, 200);
         strokeWeight(2);
         line(tankLeftX + 3, waterSurfaceY, tankRightX - 3, waterSurfaceY);
 
-        // Paredes del Contenedor
+
         stroke(255);
         strokeWeight(6);
         noFill();
@@ -138,27 +126,23 @@ public class Dyn3 extends PApplet {
         vertex(tankRightX, tankTop - (80 * vScale));
         endShape();
 
-        // ==========================================
-        // DIBUJO DEL BLOQUE Y VECTORES (FLECHITAS)
-        // ==========================================
+
         rectMode(CENTER);
         pushMatrix();
         translate(px, py);
 
-        // Cubo Transparente (Sin Relleno)
+
         strokeWeight(3);
         stroke(255);
         noFill();
         rect(0, 0, S, S);
 
 
-        // 2. Vector Flotación (Fb) - Azul, siempre hacia arriba
         drawVector(0, 0, 0, -65, color(100, 150, 255), "Fb");
 
-        // 3. Vector Fricción de Fluido (Fr) - Fricción extrema y masiva
         if (v_mag > 0.2f) {
-            float frictionDir = (vy > 0) ? -1.0f : 1.0f; // Opuesto al movimiento
-            float frictionLen = min(180, v_mag * 1.2f); // Fricción gigante para reflejar la desaceleración drástica
+            float frictionDir = (vy > 0) ? -1.0f : 1.0f;
+            float frictionLen = min(180, v_mag * 1.2f);
             drawVector(0, 0, 0, frictionDir * frictionLen*1.5f, color(255, 200, 50), "Fr");
         }
 

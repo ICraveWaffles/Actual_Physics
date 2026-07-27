@@ -13,7 +13,7 @@ public class Dyn2 extends PApplet {
 
     public static Alogo alogo;
 
-    float maxBeats = 4f; // 4 beats en total
+    float maxBeats = 4f;
 
     public void draw() {
         pushStyle();
@@ -35,21 +35,17 @@ public class Dyn2 extends PApplet {
         logoTransparency = (float) (255 * (-Math.pow(transY, 2) + 2 * (transY)));
         alogo.display(this, b, logoTransparency);
 
-        // ==========================================
-        // GEOMETRÍA Y PARÁMETROS FÍSICOS (Escala Vertical 100% -> 2.0x)
-        // ==========================================
-        float theta = PI / 6f; // 30 grados
-        float S = 70; // Tamaño del bloque
+
+        float theta = PI / 6f;
+        float S = 70;
 
         float groundY = height * 0.82f;
         float startX = width * 0.08f;
-        float vScale = 2.0f; // Factor de expansión vertical al 100%
+        float vScale = 2.0f;
 
-        // Parámetros de aceleración y rampa
         float g_orig = 280.0f;
         float g = g_orig * vScale;
 
-        // Desaceleración escalar a lo largo de la rampa
         float accelRampMag = -g_orig * sin(theta);
 
         float rampLength = 450.0f;
@@ -60,15 +56,11 @@ public class Dyn2 extends PApplet {
         float rampEndX = rampStartX + rampLength * cos(theta);
         float rampEndY = groundY - (rampLength * sin(theta)) * vScale;
 
-        // Pared lejana y contenedor
         float tankRight = width * 0.84f;
         float wallX = tankRight - S / 2f;
         float tankLeft = rampEndX + 60;
         float tankTop = rampEndY - 50;
 
-        // ==========================================
-        // CÁLCULO DE FÍSICA Y TRAYECTORIA
-        // ==========================================
         float px = 0, py = 0;
         float vx = 0, vy = 0;
         float v_mag = 0;
@@ -88,7 +80,6 @@ public class Dyn2 extends PApplet {
         float b_impact = 3.0f + dt_hit;
 
         if (b < 1.0f) {
-            // FASE 1: Plano horizontal
             onFlat = true;
             float p = b / 1.0f;
             px = lerp(startX, rampStartX, p);
@@ -106,7 +97,6 @@ public class Dyn2 extends PApplet {
             }
 
         } else if (b <= 3.0f) {
-            // FASE 2: Subida por la rampa con desaceleración consistente
             onRamp = true;
             float dt_ramp = b - 1.0f;
 
@@ -121,7 +111,6 @@ public class Dyn2 extends PApplet {
             currentAngle = -atan2(sin(theta) * vScale, cos(theta));
 
         } else if (b < b_impact) {
-            // FASE 3: Vuelo parabólico
             float dt = b - 3.0f;
 
             px = rampEndX + v0x_air * dt;
@@ -134,7 +123,6 @@ public class Dyn2 extends PApplet {
             currentAngle = atan2(vy, vx);
 
         } else {
-            // FASE 4: Impacto
             impacted = true;
             float dt = dt_hit;
 
@@ -147,9 +135,6 @@ public class Dyn2 extends PApplet {
             currentAngle = 0;
         }
 
-        // ==========================================
-        // SHAKE & SQUASH (Efectos de Choque)
-        // ==========================================
         float shakeX = 0;
         float scaleW = 1.0f, scaleH = 1.0f;
 
@@ -165,9 +150,6 @@ public class Dyn2 extends PApplet {
         pushMatrix();
         translate(shakeX, 0);
 
-        // ==========================================
-        // DIBUJO DEL ENTORNO
-        // ==========================================
         stroke(255);
         strokeWeight(5);
         line(0, groundY, width, groundY);
@@ -176,7 +158,6 @@ public class Dyn2 extends PApplet {
         strokeWeight(5);
         line(rampStartX, groundY, rampEndX, rampEndY);
 
-        // DIBUJO DE CONTENEDOR DE AGUA Y FLUIDO
         float waterH = 180 * vScale;
         float tankLeftX = tankLeft - 100;
         float tankRightX = tankRight - 100;
@@ -200,9 +181,7 @@ public class Dyn2 extends PApplet {
         vertex(tankRightX, tankTop - (80 * vScale));
         endShape();
 
-        // ==========================================
-        // DIBUJO DEL BLOQUE Y VECTORES
-        // ==========================================
+
         rectMode(CENTER);
 
         pushMatrix();
@@ -220,8 +199,6 @@ public class Dyn2 extends PApplet {
             float massVis = 0.6f;
             float w_vec = g_orig * massVis * 0.5f;
             float wy_vec = w_vec * cos(theta);
-
-            // 1. Vector Peso (P)
             pushMatrix();
             translate(0, -S / 2f);
             rotate(QUARTER_PI);
@@ -230,10 +207,8 @@ public class Dyn2 extends PApplet {
 
             translate(0, -S / 2f);
 
-            // 2. Vector Normal (N)
             drawVector(0, 0, 0, -wy_vec, 255, "");
 
-            // 3. Vector Velocidad
             if (v_mag > 10) {
                 drawVector(0, 0, v_mag * 0.3f, 0, 255, "");
             }
@@ -242,9 +217,6 @@ public class Dyn2 extends PApplet {
 
         popMatrix();
 
-        // ==========================================
-        // BARRITAS DE ENERGÍA (UI - EC y EP)
-        // ==========================================
         float currentKE = 0.5f * (v_mag * v_mag);
         float h = max(0, (groundY - py) / vScale);
         float currentPE = g_orig * h;

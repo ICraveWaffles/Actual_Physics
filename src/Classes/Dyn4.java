@@ -13,7 +13,7 @@ public class Dyn4 extends PApplet {
 
     public static Alogo alogo;
 
-    float maxBeats = 8f; // 8 beats en total
+    float maxBeats = 8f;
 
     public void draw() {
         pushStyle();
@@ -35,34 +35,27 @@ public class Dyn4 extends PApplet {
         logoTransparency = (float) (255 * (-Math.pow(transY, 2) + 2 * (transY)));
         alogo.display(this, b, logoTransparency);
 
-        // ==========================================
-        // GEOMETRÍA Y PARÁMETROS DEL CONO CENTRADOS
-        // ==========================================
         float cx = width / 2f;
         float cy = height / 2f;
 
         float L = 380f;
-        float stringAngle = PI / 4f; // 45 grados
+        float stringAngle = PI / 4f;
 
         float R = L * sin(stringAngle);
         float h = L * cos(stringAngle);
 
-        // ==========================================
-        // CÁLCULO DE ÁNGULO DE ROTACIÓN (PHI) POR FASES
-        // ==========================================
+
         float phi;
         if (b < 4.0f) {
-            phi = b * HALF_PI; // Fase 1: Péndulo cónico / MCU inicial
+            phi = b * HALF_PI;
         } else if (b < 6.0f) {
-            phi = 2.0f * PI + (b - 4.0f) * PI; // Fase 2: MCU (Doble velocidad: pi rad/beat)
+            phi = 2.0f * PI + (b - 4.0f) * PI;
         } else {
             float u = (b - 6.0f) / 2.0f;
             if (u > 1.0f) u = 1.0f;
-            // Fase 3: MCUA (Desaceleración hasta detenerse arriba)
             phi = (-PI) * (u * u * u) + (0.5f * PI) * (u * u) + (2.0f * PI) * u + (4.0f * PI);
         }
 
-        // Transición de 3D a vista en planta (Beats 3.75 a 4.0)
         float p = 0f;
         if (b >= 3.75f && b < 4.0f) {
             p = (b - 3.75f) / 0.25f;
@@ -72,7 +65,6 @@ public class Dyn4 extends PApplet {
             p = 1.0f;
         }
 
-        // --- ESTADO 3D (Inicio): Péndulo cónico ---
         float pivotX_3d = cx;
         float pivotY_3d = cy - h * 0.5f;
 
@@ -84,14 +76,12 @@ public class Dyn4 extends PApplet {
         float ballX_3d = cx + x_rel;
         float ballY_3d = pivotY_3d + y_rel + z_rel * tilt3d;
 
-        // --- ESTADO PLANTA (Fin): Vista superior ortográfica (MCU / MCUA) ---
         float pivotX_top = cx;
         float pivotY_top = cy;
 
         float ballX_top = cx + R * cos(phi);
         float ballY_top = cy + R * sin(phi);
 
-        // --- INTERPOLACIÓN DINÁMICA ---
         float pivotX = lerp(pivotX_3d, pivotX_top, p);
         float pivotY = lerp(pivotY_3d, pivotY_top, p);
 
@@ -105,22 +95,15 @@ public class Dyn4 extends PApplet {
 
         float ballSize = 75f;
 
-        // ==========================================
-        // DIBUJO DE ELEMENTOS
-        // ==========================================
-
-        // Centro del cono
         stroke(255, lerp(40, 180, p));
         strokeWeight(3);
         point(cx, cy);
 
-        // Trayectoria de la base del cono / órbita circular
         noFill();
         stroke(255, 90);
         strokeWeight(2);
         ellipse(ellipseX, ellipseY, ellipseW, ellipseH);
 
-        // Sectores de pi/2 en vista superior (Beats 4 a 8)
         if (b >= 4.0f) {
             noStroke();
             fill(0, 140, 255, 30);
@@ -132,7 +115,6 @@ public class Dyn4 extends PApplet {
             line(cx, cy - R - 20, cx, cy + R + 20);
         }
 
-        // --- LÍNEA VERTICAL DISCONTINUA (Solo en 3D antes de la transición) ---
         if (b < 3.75f) {
             stroke(255, 120);
             strokeWeight(2);
@@ -146,7 +128,6 @@ public class Dyn4 extends PApplet {
                 currentY = nextY + spaceLength;
             }
 
-            // Arco y etiqueta para el ángulo (theta)
             noFill();
             stroke(255, 200);
             strokeWeight(2);
@@ -156,14 +137,8 @@ public class Dyn4 extends PApplet {
             float stopAngle = max(HALF_PI, stringVectorAngle);
             arc(pivotX, pivotY, arcRadius * 2, arcRadius * 2, startAngle, stopAngle);
 
-            fill(255);
-            textSize(22);
-            float textOffsetX = (bx >= pivotX) ? 15f : -30f;
-            textAlign(bx >= pivotX ? LEFT : RIGHT, CENTER);
-            text("θ", pivotX + textOffsetX, pivotY + 45);
         }
 
-        // Cuerda / Radio con efecto de flash y semitransparencia en Beats 5-6
         float flash = 0f;
         if (b >= 5.0f && b <= 6.0f) {
             flash = exp(-12.0f * (b - 5.0f) * (b - 5.0f));
@@ -175,7 +150,6 @@ public class Dyn4 extends PApplet {
         strokeWeight(lineWeight);
         line(pivotX, pivotY, bx, by);
 
-        // Pelota y fuerzas / aceleraciones
         pushMatrix();
         translate(bx, by);
 
@@ -188,10 +162,8 @@ public class Dyn4 extends PApplet {
         stroke(255, 150);
 
         if (b < 3.75f) {
-            // 1. Vector Peso (P) hacia abajo
             drawVector(0, 0, 0, 75, 255);
 
-            // 2. Vector Tensión (T) hacia el pivote
             float dxPivot = pivotX - bx;
             float dyPivot = pivotY - by;
             float distPivot = dist(0, 0, dxPivot, dyPivot);
@@ -207,8 +179,6 @@ public class Dyn4 extends PApplet {
                 line(tx, 0, tx, ty);
             }
         } else if (b >= 4.0f) {
-            // --- ACELERACIONES SEGÚN IB PHYSICS NS (HL) ---
-            // Aceleración centrípeta (ac) siempre hacia el centro
             float toCenterX = cx - bx;
             float toCenterY = cy - by;
             float dCenter = dist(0, 0, toCenterX, toCenterY);

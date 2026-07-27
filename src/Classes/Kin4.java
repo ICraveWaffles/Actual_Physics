@@ -74,16 +74,13 @@ public class Kin4 extends PApplet {
         strokeWeight(2);
         rect(blockX, blockY, blockSize, blockSize);
 
-        // Beat 2: FUERZA impulsora aplicada hacia la derecha
         if (animT >= beatDuration && animT < hitTime) {
             float forceProgress = constrain((animT - beatDuration) / (beatDuration * 0.3f), 0, 1);
             float arrowLen = 220 * forceProgress;
             drawVector(blockX + blockSize / 2f, blockY + blockSize / 2f, blockX + blockSize / 2f + arrowLen, blockY + blockSize / 2f, 255);
         }
 
-        // Beat 3: Movimiento por inercia -> SIN FLECHA
 
-        // Beat 4: FUERZA DE FRICCIÓN (Flecha sustancialmente MÁS LARGA)
         if (animT >= frictionStartTime) {
             float fProgress = 1.0f - constrain((animT - frictionStartTime) / beatDuration, 0, 1);
             if (fProgress > 0.05f) {

@@ -35,7 +35,7 @@ public class Dyn1 extends PApplet {
         logoTransparency = (float) (255 * (-Math.pow(transY, 2) + 2 * (transY)));
         alogo.display(this, b, logoTransparency);
 
-        float S = 120; // Tamaño base de los bloques
+        float S = 120;
         float wallL = width * 0.12f;
         float wallR = width * 0.88f;
         float cx = width / 2f;
@@ -47,9 +47,7 @@ public class Dyn1 extends PApplet {
         float topY = height * 0.35f;
         float botY = height * 0.70f;
 
-        // ==========================================
-        // CÁLCULO DE SHAKE (Temblor por colisión)
-        // ==========================================
+
         float shakeX = 0;
         float window = 0.06f;
 
@@ -67,7 +65,7 @@ public class Dyn1 extends PApplet {
         pushMatrix();
         translate(shakeX, 0);
 
-        // Dibujo de muros y línea central
+
         stroke(150);
         strokeWeight(4);
         line(wallL, topY - S - 30, wallL, botY + S + 30);
@@ -81,9 +79,6 @@ public class Dyn1 extends PApplet {
 
         rectMode(CENTER);
 
-        // ==========================================
-        // SISTEMA 1: ELÁSTICO (Corcheas)
-        // ==========================================
         float x1, x2;
 
         if (bTop < 0.5f) {
@@ -100,14 +95,13 @@ public class Dyn1 extends PApplet {
             x2 = cx + S/2f;
         }
 
-        // Destellos y deformación (Stretch & Squash)
         float flash1 = 0, scaleW1 = 1f, scaleH1 = 1f;
         float flash2 = 0, scaleW2 = 1f, scaleH2 = 1f;
 
         if (abs(bTop - 0.0f) < window || abs(bTop - 2.0f) < window) {
             float p = abs(bTop - 0.0f);
             flash1 = map(p, 0, window, 255, 0);
-            scaleW1 = 0.8f; scaleH1 = 1.2f; // Squash horizontal
+            scaleW1 = 0.8f; scaleH1 = 1.2f;
         }
         if (abs(bTop - 0.5f) < window) {
             float p = abs(bTop - 0.5f);
@@ -127,7 +121,6 @@ public class Dyn1 extends PApplet {
             flash2 = max(flash2, fVal); scaleW2 = 1.2f; scaleH2 = 0.8f;
         }
 
-        // Dibujar Bloque 1 Elástico con transformaciones
         pushMatrix();
         translate(x1, topY);
         scale(scaleW1, scaleH1);
@@ -137,7 +130,6 @@ public class Dyn1 extends PApplet {
         rect(0, 0, S, S);
         popMatrix();
 
-        // Dibujar Bloque 2 Elástico con transformaciones
         pushMatrix();
         translate(x2, topY);
         scale(scaleW2, scaleH2);
@@ -148,9 +140,6 @@ public class Dyn1 extends PApplet {
         popMatrix();
 
 
-        // ==========================================
-        // SISTEMA 2: INELÁSTICO (Doble de rápido)
-        // ==========================================
         float x3, x4;
 
         if (bBot < 1.0f) {
@@ -179,7 +168,7 @@ public class Dyn1 extends PApplet {
         if (db1 < window || db2 < window || db3 < window) {
             float distToHit = min(min(db1, db2), db3);
             flashBot = map(distToHit, 0, window, 255, 0);
-            scaleWBot = 1.15f; scaleHBot = 0.85f; // Deformación por impacto inelástico
+            scaleWBot = 1.15f; scaleHBot = 0.85f;
         }
 
         stroke(255);
