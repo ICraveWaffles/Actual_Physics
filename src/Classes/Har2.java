@@ -53,9 +53,7 @@ public class Har2 extends PApplet {
 
         drawSpring(anchorX, anchorY, massY - massSize / 2f, 16, 16f);
 
-        stroke(255, 60);
-        strokeWeight(1);
-        line(anchorX - 60, anchorY + restLen, anchorX + 60, anchorY + restLen);
+
 
         fill(255);
         stroke(200);

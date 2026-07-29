@@ -52,17 +52,8 @@ public class Har3 extends PApplet {
         strokeWeight(1);
         line(startX, transY0, endX, transY0);
 
-        stroke(100, 220, 255);
-        strokeWeight(3);
-        noFill();
-        beginShape();
-        for (float x = startX; x <= endX; x += 3) {
-            float y = transY0 - ampTrans * sin(k * (x - startX) - phase);
-            vertex(x, y);
-        }
-        endShape();
 
-        for (float x = startX; x <= endX; x += waveLen / 8f) {
+        for (float x = startX; x <= endX; x += waveLen / 64f) {
             float y = transY0 - ampTrans * sin(k * (x - startX) - phase);
             fill(100, 220, 255);
             noStroke();
@@ -73,7 +64,6 @@ public class Har3 extends PApplet {
         float trackY_T = transY0 - ampTrans * sin(k * (trackX_T - startX) - phase);
         fill(255, 100, 100);
         circle(trackX_T, trackY_T, 12);
-        drawDoubleArrowVert(trackX_T, transY0 - ampTrans, transY0 + ampTrans, color(255, 100, 100, 180));
 
         float crestX = startX + waveLen * 0.25f;
         float troughX = startX + waveLen * 0.75f;
@@ -86,7 +76,6 @@ public class Har3 extends PApplet {
 
         drawDimensionLine(startX + waveLen * 0.25f, transY0 - ampTrans - 40, startX + waveLen * 1.25f, transY0 - ampTrans - 40, "");
 
-        drawPropagationArrow(endX - 80, transY0 - ampTrans - 40, "");
 
         float longY0 = height * 0.68f;
         float ampLong = 38f;
@@ -113,7 +102,6 @@ public class Har3 extends PApplet {
         float trackX_L = trackX_L0 + ampLong * sin(k * (trackX_L0 - startX) - phase);
         fill(255, 100, 100);
         circle(trackX_L, longY0, 12);
-        drawDoubleArrowHoriz(trackX_L0 - ampLong, trackX_L0 + ampLong, longY0 + (rows * rowSpacing / 2f) + 15, color(255, 100, 100, 180));
 
         float compPhaseX = startX + waveLen * 0.75f;
         float rarefPhaseX = startX + waveLen * 0.25f;
@@ -123,7 +111,6 @@ public class Har3 extends PApplet {
 
         drawDimensionLine(startX + waveLen * 0.25f, longY0 + (rows * rowSpacing / 2f) + 45, startX + waveLen * 1.25f, longY0 + (rows * rowSpacing / 2f) + 45, "");
 
-        drawPropagationArrow(endX - 80, longY0 - (rows * rowSpacing / 2f) - 40, "");
 
         popStyle();
     }
