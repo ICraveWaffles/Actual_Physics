@@ -38,16 +38,16 @@ public class Grav1 extends PApplet {
             clogo.display(this, b, logoTransparency);
         }
 
-        float cx = width * 0.5f;
+        float cx = width * 0.5f - 120f;
         float cy = height * 0.5f;
 
         float boxW = width * 0.85f;
         float boxH = height * 0.82f;
-        float halfW = boxW * 0.5f;
+        float halfW = boxW * 0.33f;
         float halfH = boxH * 0.5f;
 
         float a1 = halfH * 0.85f;
-        float e1 = 0.55f;
+        float e1 = 0.95f;
         float c1 = a1 * e1;
         float b1_el = a1 * sqrt(1.0f - e1 * e1);
 
@@ -55,7 +55,7 @@ public class Grav1 extends PApplet {
         float focusY = cy;
         float focus2X = cx + c1;
 
-        float M1 = ((b % 2.0f) / 2.0f) * TWO_PI;
+        float M1 = (((b % 2.0f) / 2.0f) * TWO_PI) + PI;
         float E1 = solveKepler(M1, e1);
 
         float p1X = cx - a1 * cos(E1);
@@ -87,8 +87,6 @@ public class Grav1 extends PApplet {
         translate(cx, cy);
         scale(zoom);
         translate(-camX, -camY);
-
-
 
         noFill();
         stroke(255, 50);
@@ -130,31 +128,43 @@ public class Grav1 extends PApplet {
 
         if (b >= 10.0f && b < 12.0f) {
             noStroke();
-            float normE1 = (E1 + TWO_PI) % TWO_PI;
             float illumAlpha = (b >= 11.6f) ? map(b, 11.6f, 12.0f, 60, 210) : 60;
-
-            float periEnd = PI * 0.25f;
-            float currentSweep1 = (normE1 <= periEnd) ? normE1 : periEnd;
-
             fill(255, illumAlpha);
-            beginShape();
-            vertex(focusX, focusY);
-            float endA1 = map(currentSweep1, 0, periEnd, -PI * 0.25f, PI * 0.25f);
-            for (float a = -PI * 0.25f; a <= endA1; a += 0.03f) {
-                vertex(cx - a1 * cos(a), cy + b1_el * sin(a));
-            }
-            endShape(CLOSE);
 
-            float apoStart = PI * 0.85f;
-            float apoEnd = PI * 1.15f;
-            if (normE1 >= apoStart) {
-                float endA2 = min(normE1, apoEnd);
-                fill(255, illumAlpha);
+            float M_seq = PI + ((b - 10.0f) / 2.0f) * TWO_PI;
+            float E_seq = solveKepler(M_seq, e1);
+
+            float deltaM = 0.30f;
+
+            float mA_start = PI;
+            float mA_end = PI + deltaM;
+            float eA_start = solveKepler(mA_start, e1);
+            float eA_end = solveKepler(mA_end, e1);
+
+            if (M_seq >= mA_start) {
+                float eA_cur = min(E_seq, eA_end);
                 beginShape();
                 vertex(focusX, focusY);
-                for (float a = apoStart; a <= endA2; a += 0.03f) {
-                    vertex(cx - a1 * cos(a), cy + b1_el * sin(a));
+                for (float ea = eA_start; ea <= eA_cur; ea += 0.02f) {
+                    vertex(cx - a1 * cos(ea), cy + b1_el * sin(ea));
                 }
+                vertex(cx - a1 * cos(eA_cur), cy + b1_el * sin(eA_cur));
+                endShape(CLOSE);
+            }
+
+            float mP_start = TWO_PI - deltaM * 0.5f;
+            float mP_end = TWO_PI + deltaM * 0.5f;
+            float eP_start = solveKepler(mP_start, e1);
+            float eP_end = solveKepler(mP_end, e1);
+
+            if (M_seq >= mP_start) {
+                float eP_cur = min(E_seq, eP_end);
+                beginShape();
+                vertex(focusX, focusY);
+                for (float ep = eP_start; ep <= eP_cur; ep += 0.03f) {
+                    vertex(cx - a1 * cos(ep), cy + b1_el * sin(ep));
+                }
+                vertex(cx - a1 * cos(eP_cur), cy + b1_el * sin(eP_cur));
                 endShape(CLOSE);
             }
         }
@@ -169,7 +179,7 @@ public class Grav1 extends PApplet {
             strokeWeight(1.5f / zoom);
             drawDashedEllipse(cx - c1 + curC, cy, a1 * 2, curB * 2, 44);
 
-            float ghostM = ((b % 2.0f) / 2.0f) * TWO_PI;
+            float ghostM = (((b % 2.0f) / 2.0f) * TWO_PI) + PI;
             float ghostE = solveKepler(ghostM, curE);
             float ghostX = (cx - c1 + curC) - a1 * cos(ghostE);
             float ghostY = cy + curB * sin(ghostE);
@@ -203,8 +213,13 @@ public class Grav1 extends PApplet {
         }
 
         if (b >= 4.0f && b < 6.0f) {
-            float fMag = map(1f / (r1 * r1), 1f / ((a1 * 1.55f) * (a1 * 1.55f)), 1f / ((a1 * 0.45f) * (a1 * 0.45f)), a1 * 0.15f, a1 * 0.55f);
-            float sw = map(fMag, a1 * 0.15f, a1 * 0.55f, 2.0f, 6.5f) / zoom;
+            float rMin = a1 * (1.0f - e1);
+            float rMax = a1 * (1.0f + e1);
+            float normR = map(r1, rMin, rMax, 1.0f, 0.0f);
+            normR = pow(constrain(normR, 0f, 1f), 0.45f);
+
+            float fMag = lerp(a1 * 0.12f, a1 * 0.38f, normR);
+            float sw = lerp(2.0f, 4.5f, normR) / zoom;
             float angleToFocus = atan2(focusY - p1Y, focusX - p1X);
 
             stroke(255);
@@ -228,11 +243,11 @@ public class Grav1 extends PApplet {
         if (b >= 2.0f && b < 4.0f) {
             float mu = 80000f;
             float vSq = mu * (2f / r1 - 1f / a1);
-            float K = vSq * 0.005f * (a1 / 160f);
+            float K = vSq * 0.002f * (a1 / 160f);
             float U = -(mu / r1) * 0.005f * (a1 / 160f);
             float E_total = K + U;
 
-            float barX = cx + 540f;
+            float barX = cx + 640f;
             float barY = cy - 150f;
 
             fill(255);
@@ -244,13 +259,13 @@ public class Grav1 extends PApplet {
 
             noStroke();
             fill(255, 220);
-            rect(barX, barY + 110, 50, -K * 40);
+            rect(barX, cy, 50, -K * 40);
 
             fill(255, 120);
-            rect(barX + 80, barY + 110, 50, -U * 40);
+            rect(barX + 80, cy, 50, -U * 40);
 
             fill(255, 255);
-            rect(barX + 160, barY + 110, 50, -E_total * 40);
+            rect(barX + 160, cy, 50, -E_total * 40);
         }
 
         if (b >= 12.0f) {
@@ -265,7 +280,7 @@ public class Grav1 extends PApplet {
             ellipse(focusX + c2, cy, a2 * 2, b2_el * 2);
 
             float T2 = 2.0f * pow(a2 / a1, 1.5f);
-            float M2 = ((b % T2) / T2) * TWO_PI;
+            float M2 = (((b % T2) / T2) * TWO_PI) + PI;
             float E2 = solveKepler(M2, e2);
             float p2X_orb = (focusX + c2) - a2 * cos(E2);
             float p2Y_orb = cy + b2_el * sin(E2);
