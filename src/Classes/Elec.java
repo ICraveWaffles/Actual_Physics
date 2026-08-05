@@ -13,7 +13,7 @@ public class Elec extends PApplet {
 
     public static Dlogo clogo;
 
-    float cycleTime = 19.2f;
+    float cycleTime = 24f;
 
     public void draw() {
         pushStyle();
@@ -37,19 +37,26 @@ public class Elec extends PApplet {
             clogo.display(this, b, logoTransparency);
         }
 
-        float cx = width * 0.5f - 120f;
+        float cx = width * 0.5f;
         float cy = height * 0.5f;
 
-        float pan = 0;
-        if (b >= 12.0f) {
-            pan = (b - 12.0f) * (width * 0.25f);
+        if (b < 12.0f) {
+            drawFases123(b, cx, cy);
+        } else if (b < 16.0f) {
+            drawFase4(b, cx, cy);
+        } else {
+            drawFase5(b, cx, cy);
         }
 
-        pushMatrix();
-        translate(-pan, 0);
+        popStyle();
+    }
 
+    private void drawFases123(float b, float cx, float cy) {
         if (b < 8.0f) {
-            float alpha12 = map(b, 7.5f, 8.0f, 255, 0);
+            float alpha12 = 255;
+            if (b >= 7.8f) {
+                alpha12 = map(b, 7.8f, 8.0f, 255, 0);
+            }
 
             float state1 = 1.0f;
             if (b >= 2.0f) state1 = 1.0f - constrain((b - 2.0f) * 4.0f, 0f, 1f);
@@ -61,21 +68,8 @@ public class Elec extends PApplet {
                 state2 = constrain((b - 3.0f) * 4.0f, 0f, 1f);
             }
 
-            String relation = "REPULSIVE";
-            if (b >= 1.0f && b < 2.0f) relation = "ATTRACTIVE";
-            else if (b >= 2.0f && b < 3.0f) relation = "REPULSIVE";
-            else if (b >= 3.0f) relation = "ATTRACTIVE";
-
             float baseDist = width * 0.12f;
-            float extraDist = 0;
-
-            if (b < 5.0f) {
-                extraDist = sin(b * PI) * 55f;
-            } else if (b < 6f) {
-                extraDist = -sin((b - 1.0f) * PI) * 55f;
-            }
-
-            float r = baseDist + extraDist;
+            float r = baseDist;
             float sepProg = 0;
 
             if (b >= 4.0f) {
@@ -90,59 +84,32 @@ public class Elec extends PApplet {
             float chargeSize1 = 130f;
             float chargeSize2 = (b < 4.0f) ? 130f : lerp(130f, 44f, sepProg);
 
+            if (b < 4.0f) {
+                boolean isPos1 = state1 > 0.5f;
+                boolean isPos2 = state2 > 0.5f;
+
+                drawMiniField(x1, cy, chargeSize1, isPos1, alpha12);
+                drawMiniField(x2, cy, chargeSize2, isPos2, alpha12);
+            }
+
             if (b >= 4.0f) {
-                float barX = cx + width * 0.35f;
-                float barY = cy + height * 0.20f;
                 float F_val = map(1f/(r*r), 1f/pow(width*0.26f,2), 1f/(baseDist*baseDist), 25f, 110f);
-                float E_val = F_val * 0.9f;
-                float V_val = map(1f/r, 1f/(width*0.26f), 1f/baseDist, 45f, 110f);
-                float I_val = lerp(110f, 35f, sepProg);
 
-                rectMode(CORNER); textSize(16); textAlign(LEFT, CENTER);
-
-                if (b >= 4.0f) {
-                    float aF = constrain(map(b, 4.0f, 4.5f, 0, 255), 0, alpha12);
-                    fill(255, aF); text("F", barX, barY + 20);
-                    noStroke(); fill(255, 220 * (aF/255f)); rect(barX - 10, barY, 32, -F_val);
-                }
-                if (b >= 5.0f) {
-                    float aE = constrain(map(b, 5.0f, 5.5f, 0, 255), 0, alpha12);
-                    fill(255, aE); text("E", barX + 55, barY + 20);
-                    noStroke(); fill(255, 160 * (aE/255f)); rect(barX + 45, barY, 32, -E_val);
-                }
-                if (b >= 6.0f) {
-                    float aV = constrain(map(b, 6.0f, 6.5f, 0, 255), 0, alpha12);
-                    fill(255, aV); text("V", barX + 110, barY + 20);
-                    noStroke(); fill(255, 110 * (aV/255f)); rect(barX + 100, barY, 32, -V_val);
-                }
-                if (b >= 7.0f) {
-                    float aI = constrain(map(b, 7.0f, 7.5f, 0, 255), 0, alpha12);
-                    fill(255, aI); text("I", barX + 165, barY + 20);
-                    noStroke(); fill(255, 60 * (aI/255f)); rect(barX + 155, barY, 32, -I_val);
-                }
-
-                if (b >= 4.0f && b < 6.0f) {
-                    float aF = constrain(map(b, 4.0f, 4.5f, 0, 255), 0, alpha12);
+                if (b < 6.0f) {
                     float fMag = map(F_val, 25f, 110f, 50f, 130f);
-                    stroke(255, aF);
+                    stroke(255);
                     drawArrow(x1 + chargeSize1 * 0.5f + 10, cy, x1 + chargeSize1 * 0.5f + 10 + fMag, cy, 3.5f);
                     drawArrow(x2 - chargeSize2 * 0.5f - 10, cy, x2 - chargeSize2 * 0.5f - 10 - fMag, cy, 3.5f);
                 }
 
                 if (b >= 6.0f && b < 8.0f) {
-                    float linesAlpha = constrain(map(b, 6.0f, 6.5f, 0, 255), 0, 255) * (alpha12 / 255f);
-                    stroke(255, linesAlpha);
+                    stroke(255, 180);
                     noFill();
                     strokeWeight(1.5f);
 
-                    int numLines = 28;
-                    float stepSize = 8f;
-                    int maxSteps = 250;
-
-                    float[] arrowX = new float[1000];
-                    float[] arrowY = new float[1000];
-                    float[] arrowA = new float[1000];
-                    int arrowCount = 0;
+                    int numLines = 12;
+                    float stepSize = 25;
+                    int maxSteps = 150;
 
                     for (int i = 0; i < numLines; i++) {
                         float startAngle = i * TWO_PI / numLines;
@@ -173,96 +140,61 @@ public class Elec extends PApplet {
                             px += nx * stepSize;
                             py += ny * stepSize;
 
-                            if (s == 15 || s == 40 || s == 75 || s == 120) {
-                                if (arrowCount < 1000) {
-                                    arrowX[arrowCount] = px;
-                                    arrowY[arrowCount] = py;
-                                    arrowA[arrowCount] = atan2(ny, nx);
-                                    arrowCount++;
-                                }
+                            if (s == 20 || s == 60) {
+                                drawArrowHead(px, py, atan2(ny, nx), 6f, 180);
                             }
 
-                            if (d1 < (chargeSize1 * 0.5f)) {
-                                vertex(px, py);
-                                break;
-                            }
-                            if (px < -pan - width || px > width * 2 || py < -height || py > height * 2) {
+                            if (d1 < (chargeSize1 * 0.5f) || px < -width || px > width * 2 || py < -height || py > height * 2) {
                                 break;
                             }
                         }
                         endShape();
                     }
-
-                    for (int a = 0; a < arrowCount; a++) {
-                        drawArrowHead(arrowX[a], arrowY[a], arrowA[a], 7f, linesAlpha);
-                    }
                 }
             }
 
-            if (b < 4.0f) {
-                float beatOscilation = sin(b * PI) * 80f;
-                float rectX = cx + width * 0.32f;
-                float rectY = cy + beatOscilation;
-
-                rectMode(CENTER);
-                strokeWeight(2.5f);
-                stroke(50, 255, 50, alpha12);
-                fill(50, 255, 50, 40 * (alpha12 / 255f));
-                rect(rectX, rectY, 220, 60, 12);
-
-                fill(50, 255, 50, alpha12);
-                textSize(22); textAlign(CENTER, CENTER);
-                text(relation, rectX, rectY - 2);
-            }
-
-            stroke(255, alpha12); strokeWeight(2.5f);
-            fill(0, alpha12);
+            stroke(255); strokeWeight(2.5f);
+            fill(0);
             circle(x1, cy, chargeSize1);
             circle(x2, cy, chargeSize2);
 
-            drawSign(x1, cy, state1, alpha12, chargeSize1);
-            drawSign(x2, cy, state2, alpha12, chargeSize2);
+            drawSign(x1, cy, state1, 255, chargeSize1);
+            drawSign(x2, cy, state2, 255, chargeSize2);
         }
 
-        if (b >= 7.5f && b < 12.0f) {
-            float alpha3 = map(b, 7.5f, 8.0f, 0, 255);
-            if (b > 11.5f) {
-                alpha3 = map(b, 11.5f, 12.0f, 255, 0);
+        if (b >= 8.0f && b < 12.0f) {
+            float alpha3 = 255;
+
+            float plateX = width * 0.5f;
+            float plateY = cy - 220f;
+            float plateW = width * 3f;
+            float plateH = 25f;
+
+            stroke(255, alpha3);
+            strokeWeight(1.5f);
+            noFill();
+            rectMode(CENTER);
+            rect(plateX, plateY, plateW, plateH);
+
+            fill(255, alpha3);
+            textSize(50);
+            textAlign(CENTER, BOTTOM);
+            float signStep = 80f;
+            float startSignX = plateX - plateW * 0.5f + 35f;
+            for (float fx = startSignX; fx < startSignX + plateW; fx += signStep) {
+                text("-", fx, plateY - plateH * 0.5f - 18);
             }
 
-            pushMatrix();
-            float plateX = cx + width * 0.08f;
-            translate(plateX, cy);
+            float pivotX = width * 0.5f;
+            float pivotY = plateY + plateH * 0.5f;
+            float stringL = 300f;
 
-            noStroke();
-            fill(50, alpha3); rectMode(CENTER);
-            rect(-15, 0, 30, height * 0.6f, 6);
-            fill(30, alpha3);
-            rect(-35, 0, 10, height * 0.65f);
-            fill(180, alpha3);
-            rect(5, 0, 10, height * 0.55f, 4);
+            fill(255, alpha3); noStroke();
+            circle(pivotX, pivotY, 6);
 
-            for (float py = -height * 0.24f; py <= height * 0.24f; py += 35) {
-                drawSign(5, py, 1.0f, alpha3, 22f);
-            }
-            popMatrix();
-
-            float pivotX = cx + width * 0.26f;
-            float pivotY = cy - 220f;
-            float stringL = 220f;
-
-            stroke(120, alpha3); strokeWeight(5);
-            line(pivotX - 60, pivotY, pivotX + 60, pivotY);
-            for (float hx = pivotX - 50; hx <= pivotX + 50; hx += 12) {
-                line(hx, pivotY, hx + 12, pivotY - 12);
-            }
-            fill(180, alpha3); noStroke();
-            circle(pivotX, pivotY, 14);
-
-            float tDef = max(0, b - 8.0f);
-            float targetTheta = 35f;
-            float thetaDeg = targetTheta * (1.0f - exp(-2.0f * tDef) * cos(TWO_PI * 0.8f * tDef));
-            float theta = radians(thetaDeg);
+            float tDeflect = max(0, b - 8.0f);
+            float targetDefAngle = radians(32f);
+            float theta = targetDefAngle * (1.0f - exp(-2.0f * tDeflect) * cos(TWO_PI * 0.8f * tDeflect));
 
             float massX = pivotX + stringL * sin(theta);
             float massY = pivotY + stringL * cos(theta);
@@ -274,81 +206,215 @@ public class Elec extends PApplet {
             circle(massX, massY, 44);
             drawSign(massX, massY, 1.0f, alpha3, 44f);
 
-            if (tDef > 0.1f) {
+            if (tDeflect > 0.1f) {
                 float fgLen = 80f;
                 stroke(255, alpha3);
                 drawArrow(massX, massY + 22, massX, massY + 22 + fgLen, 2.5f);
                 drawArrow(massX + 22, massY, massX + 22 + fgLen * tan(radians(32f)), massY, 2.5f);
             }
         }
+    }
 
-        if (b >= 12.0f) {
-            float cx4 = cx + width * 0.5f + pan;
+    private void drawMiniField(float cx, float cy, float radius, boolean isPositive, float alpha) {
+        int numRays = 8;
+        float rayLen = 120f;
+        float rStart = radius * 0.5f + 4f;
+        float rEnd = rStart + rayLen;
 
-            rectMode(CENTER); noStroke();
-            fill(40);
-            rect(cx4, cy - 200, width * 3f, 25);
-            rect(cx4, cy + 200, width * 3f, 25);
+        stroke(255, alpha * 0.35f);
+        strokeWeight(1.0f);
 
-            for (float fx = cx4 - width * 1.5f; fx <= cx4 + width * 1.5f; fx += 38) {
-                drawSign(fx, cy - 204, 0.0f, 255, 30f);
-                drawSign(fx, cy + 196, 1.0f, 255, 30f);
+        float flowOffset = (frameCount * 0.04f) % 1.0f;
+
+        for (int i = 0; i < numRays; i++) {
+            float angle = i * TWO_PI / numRays;
+            float cosA = cos(angle);
+            float sinA = sin(angle);
+
+            float xInner = cx + cosA * rStart;
+            float yInner = cy + sinA * rStart;
+            float xOuter = cx + cosA * rEnd;
+            float yOuter = cy + sinA * rEnd;
+
+            line(xInner, yInner, xOuter, yOuter);
+
+            for (int a = 0; a < 2; a++) {
+                float p = (flowOffset + a * 0.5f) % 1.0f;
+                float rHead = isPositive ? lerp(rStart, rEnd, p) : lerp(rEnd, rStart, p);
+                float hx = cx + cosA * rHead;
+                float hy = cy + sinA * rHead;
+
+                float arrowAlpha = alpha * map(sin(p * PI), 0, 1, 0, 0.9f);
+                float arrowDir = isPositive ? angle : angle + PI;
+
+                drawArrowHead(hx, hy, arrowDir, 6.5f, arrowAlpha);
             }
+        }
+    }
 
-            stroke(255, 35); strokeWeight(1.5f);
-            for (float fx = cx4 - width * 1.5f; fx <= cx4 + width * 1.5f; fx += 55) {
-                drawArrow(fx, cy + 175, fx, cy - 175, 1.2f);
+    private void drawFase4(float b, float cx, float cy) {
+        float b4 = b;
+
+        pushMatrix();
+
+        float fastSpeed = 900f;
+        float plateShift = (b4 - 12.0f) * fastSpeed;
+
+        float plateWidth = width * 4f;
+        float plateHeight = 25f;
+
+        float currentPlateX = (width * 0.5f) + (plateShift % 80f);
+
+        stroke(255);
+        strokeWeight(1.5f);
+        noFill();
+        rectMode(CENTER);
+        rect(currentPlateX, cy - 200, plateWidth, plateHeight);
+        rect(currentPlateX, cy + 200, plateWidth, plateHeight);
+
+        fill(255);
+        textSize(50);
+        float signStep = 80f;
+        float startSignX = currentPlateX - plateWidth * 0.5f;
+
+        textAlign(CENTER, BOTTOM);
+        for (float fx = startSignX; fx < startSignX + plateWidth; fx += signStep) {
+            text("-", fx, cy - 200 - 18);
+        }
+
+        textAlign(CENTER, TOP);
+        for (float fx = startSignX; fx < startSignX + plateWidth; fx += signStep) {
+            text("+", fx, cy + 200 + 18);
+        }
+
+        stroke(255, 35);
+        strokeWeight(1.5f);
+        for (float fx = startSignX; fx < startSignX + plateWidth; fx += 55) {
+            drawArrow(fx, cy - 180, fx, cy + 180, 1.2f);
+        }
+
+        if (b4 >= 14.0f) {
+            float b_traj = constrain(b4, 14.0f, 16.0f);
+            float t_norm = map(b_traj, 14.0f, 16.0f, 0.0f, 1.0f);
+
+            float startX = 0f;
+            float targetX = width * 0.5f;
+            float targetY = height * 0.5f;
+            float startY = cy + 150f;
+
+            float a = (startY - targetY) / sq(startX - targetX);
+
+            noFill();
+            stroke(255, 180);
+            strokeWeight(2.5f);
+
+            beginShape();
+            for (float t_s = 0; t_s <= t_norm; t_s += 0.01f) {
+                float px = lerp(startX, targetX, t_s);
+                float py = a * sq(px - targetX) + targetY;
+                vertex(px, py);
             }
+            endShape();
 
-            if (b >= 14f) {
-                float t_e = constrain(map(b, 12.5f, 15.0f, 0.0f, 1.0f), 0.0f, 1.0f);
+            float p_e_x = lerp(startX, targetX, t_norm);
+            float p_e_y = a * sq(p_e_x - targetX) + targetY;
 
-                float startX = -30f;
-                float endX = cx4;
-                float endY = cy;
+            stroke(255);
+            fill(0);
+            strokeWeight(2);
+            circle(p_e_x, p_e_y, 26);
+            drawSign(p_e_x, p_e_y, 0.0f, 255, 26f);
 
-                float xv = width * 0.5f;
-                float yv = height * 0.5f;
-
-                float a = (endY - yv) / sq(endX - xv);
-
-                noFill();
-                stroke(255, 180);
-                strokeWeight(2.5f);
-
-                beginShape();
-                for (float i = 0; i <= t_e; i += 0.02f) {
-                    float px = lerp(startX, endX, i);
-                    float py = a * sq(px - xv) + yv;
-                    vertex(px, py);
-                }
-                endShape();
-
-                float eX = lerp(startX, endX, t_e);
-                float eY = a * sq(eX - xv) + yv;
+            if (t_norm < 1.0f) {
+                float v_hor = width * 0.025f;
+                float v_ver = 2f * a * (p_e_x - targetX) * v_hor;
 
                 stroke(255);
-                fill(0);
-                strokeWeight(2);
-                circle(eX, eY, 26);
-                drawSign(eX, eY, 0.0f, 255, 26f);
+                drawArrow(p_e_x, p_e_y, p_e_x + v_hor, p_e_y, 2.5f);
 
-                if (t_e < 1.0f) {
-                    float vx = (endX - startX) * 0.10f;
-                    float vy = 2.0f * a * (eX - xv) * vx;
-
-                    stroke(255);
-                    drawArrow(eX, eY, eX + vx, eY, 2.5f);
-
-                    if (abs(vy) > 1.5f) {
-                        drawArrow(eX, eY, eX, eY + vy, 2.5f);
-                    }
+                if (abs(v_ver) > 0.5f) {
+                    drawArrow(p_e_x, p_e_y, p_e_x, p_e_y + v_ver, 2.5f);
                 }
             }
         }
 
         popMatrix();
-        popStyle();
+    }
+
+    private void drawFase5(float b, float cx, float cy) {
+        pushMatrix();
+
+        float fastSpeed = 900f;
+        float plateShift = (b - 12.0f) * fastSpeed;
+
+        float plateWidth = width * 4f;
+        float plateHeight = 25f;
+        float currentPlateX = (width * 0.5f) + (plateShift % 80f);
+
+        stroke(255);
+        strokeWeight(1.5f);
+        noFill();
+        rectMode(CENTER);
+        rect(currentPlateX, cy - 200, plateWidth, plateHeight);
+        rect(currentPlateX, cy + 200, plateWidth, plateHeight);
+
+        fill(255);
+        textSize(50);
+        float signStep = 80f;
+        float startSignX = currentPlateX - plateWidth * 0.5f;
+
+        textAlign(CENTER, BOTTOM);
+        for (float fx = startSignX; fx < startSignX + plateWidth; fx += signStep) {
+            text("-", fx, cy - 200 - 18);
+        }
+
+        textAlign(CENTER, TOP);
+        for (float fx = startSignX; fx < startSignX + plateWidth; fx += signStep) {
+            text("+", fx, cy + 200 + 18);
+        }
+
+        stroke(255, 35);
+        strokeWeight(1.5f);
+        for (float fx = startSignX; fx < startSignX + plateWidth; fx += 55) {
+            drawArrow(fx, cy - 180, fx, cy + 180, 1.2f);
+        }
+
+        float tRel = b - 16.0f;
+        float phase = 45.0f * tRel - 5.0f * tRel * tRel;
+        float flickerSignal = sin(phase) + noise(tRel * 8f) * 0.4f;
+        float flicker = (flickerSignal > 0.1f) ? 1.0f : 0.05f;
+
+        float bAlpha = 200f * flicker;
+        stroke(255, bAlpha);
+        strokeWeight(1.2f);
+        noFill();
+
+        for (float gx = 80; gx < width; gx += 100) {
+            for (float gy = cy - 130; gy <= cy + 130; gy += 65) {
+                circle(gx, gy, 14);
+                line(gx - 4, gy - 4, gx + 4, gy + 4);
+                line(gx - 4, gy + 4, gx + 4, gy - 4);
+            }
+        }
+
+        float p_e_x = width * 0.5f;
+        float p_e_y = cy;
+
+        stroke(255);
+        fill(0);
+        strokeWeight(2);
+        circle(p_e_x, p_e_y, 26);
+        drawSign(p_e_x, p_e_y, 0.0f, 255, 26f);
+
+        float v_hor = width * 0.025f;
+        float forceMag = 70f;
+
+        stroke(255);
+        drawArrow(p_e_x, p_e_y, p_e_x + v_hor, p_e_y, 2.5f);
+        drawArrow(p_e_x, p_e_y, p_e_x, p_e_y - forceMag, 2.5f);
+        drawArrow(p_e_x, p_e_y, p_e_x, p_e_y + forceMag, 2.5f);
+
+        popMatrix();
     }
 
     private void drawArrow(float x1, float y1, float x2, float y2, float weight) {
