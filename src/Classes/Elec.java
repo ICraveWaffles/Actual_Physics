@@ -13,7 +13,7 @@ public class Elec extends PApplet {
 
     public static Dlogo clogo;
 
-    float cycleTime = 24f;
+    float cycleTime = 24.0f;
 
     public void draw() {
         pushStyle();
@@ -107,8 +107,8 @@ public class Elec extends PApplet {
                     noFill();
                     strokeWeight(1.5f);
 
-                    int numLines = 12;
-                    float stepSize = 25;
+                    int numLines = 20;
+                    float stepSize = 10f;
                     int maxSteps = 150;
 
                     for (int i = 0; i < numLines; i++) {
@@ -166,18 +166,18 @@ public class Elec extends PApplet {
             float alpha3 = 255;
 
             float plateX = width * 0.5f;
-            float plateY = cy - 220f;
+            float plateY = cy - 250f;
             float plateW = width * 3f;
-            float plateH = 25f;
+            float plateH = 30f;
 
             stroke(255, alpha3);
-            strokeWeight(1.5f);
+            strokeWeight(2.0f);
             noFill();
             rectMode(CENTER);
             rect(plateX, plateY, plateW, plateH);
 
             fill(255, alpha3);
-            textSize(50);
+            textSize(55);
             textAlign(CENTER, BOTTOM);
             float signStep = 80f;
             float startSignX = plateX - plateW * 0.5f + 35f;
@@ -187,30 +187,47 @@ public class Elec extends PApplet {
 
             float pivotX = width * 0.5f;
             float pivotY = plateY + plateH * 0.5f;
-            float stringL = 300f;
-
-            fill(255, alpha3); noStroke();
-            circle(pivotX, pivotY, 6);
+            float stringL = 360f;
+            float massRadius = 60f;
 
             float tDeflect = max(0, b - 8.0f);
-            float targetDefAngle = radians(32f);
+            float targetDefAngle = radians(35f);
             float theta = targetDefAngle * (1.0f - exp(-2.0f * tDeflect) * cos(TWO_PI * 0.8f * tDeflect));
+
+            stroke(255, 100);
+            strokeWeight(1.5f);
+            for (float dy = 0; dy < stringL + 30; dy += 16) {
+                line(pivotX, pivotY + dy, pivotX, pivotY + dy + 8);
+            }
+
+            if (theta > 0.02f) {
+                noFill();
+                stroke(255, 200);
+                strokeWeight(1.5f);
+                float arcRadius = 110f;
+                arc(pivotX, pivotY, arcRadius, arcRadius, HALF_PI, HALF_PI - theta);
+            }
+
+            fill(255, alpha3); noStroke();
+            circle(pivotX, pivotY, 10);
 
             float massX = pivotX + stringL * sin(theta);
             float massY = pivotY + stringL * cos(theta);
 
-            stroke(255, alpha3); strokeWeight(2.5f);
+            stroke(255, alpha3); strokeWeight(3.0f);
             line(pivotX, pivotY, massX, massY);
 
-            fill(0, alpha3); stroke(255, alpha3); strokeWeight(2.5f);
-            circle(massX, massY, 44);
-            drawSign(massX, massY, 1.0f, alpha3, 44f);
+            fill(0, alpha3); stroke(255, alpha3); strokeWeight(3.0f);
+            circle(massX, massY, massRadius);
+            drawSign(massX, massY, 1.0f, alpha3, massRadius);
 
             if (tDeflect > 0.1f) {
-                float fgLen = 80f;
+                float fgLen = 100f;
+                float feLen = fgLen * tan(radians(35f));
+
                 stroke(255, alpha3);
-                drawArrow(massX, massY + 22, massX, massY + 22 + fgLen, 2.5f);
-                drawArrow(massX + 22, massY, massX + 22 + fgLen * tan(radians(32f)), massY, 2.5f);
+                drawArrow(massX, massY + massRadius * 0.5f, massX, massY + massRadius * 0.5f + fgLen, 3.0f);
+                drawArrow(massX + massRadius * 0.5f, massY, massX + massRadius * 0.5f + feLen, massY, 3.0f);
             }
         }
     }
@@ -257,7 +274,7 @@ public class Elec extends PApplet {
 
         pushMatrix();
 
-        float fastSpeed = 900f;
+        float fastSpeed = 450f;
         float plateShift = (b4 - 12.0f) * fastSpeed;
 
         float plateWidth = width * 4f;
@@ -344,7 +361,7 @@ public class Elec extends PApplet {
     private void drawFase5(float b, float cx, float cy) {
         pushMatrix();
 
-        float fastSpeed = 900f;
+        float fastSpeed = 450f;
         float plateShift = (b - 12.0f) * fastSpeed;
 
         float plateWidth = width * 4f;
@@ -389,7 +406,10 @@ public class Elec extends PApplet {
         strokeWeight(1.2f);
         noFill();
 
-        for (float gx = 80; gx < width; gx += 100) {
+        float gridSpacingX = 100f;
+        float gridShiftX = plateShift % gridSpacingX;
+
+        for (float gx = -gridSpacingX + gridShiftX; gx < width + gridSpacingX; gx += gridSpacingX) {
             for (float gy = cy - 130; gy <= cy + 130; gy += 65) {
                 circle(gx, gy, 14);
                 line(gx - 4, gy - 4, gx + 4, gy + 4);
