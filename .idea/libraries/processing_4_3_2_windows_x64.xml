@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="processing-4.3.2-windows-x64">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/Downloads/processing-4.3.2-windows-x64.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

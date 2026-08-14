@@ -182,11 +182,11 @@ public class LogoAbstract {
 
         p5.noFill();
         p5.stroke(trans);
-        p5.fill(trans);
         p5.strokeWeight(2);
 
         float L = 10f;
-        float shift = 3.5f * (float)Math.sin(t * 2);
+
+        float shift = 3.5f * (float)Math.sin(PApplet.PI * t);
 
         p5.beginShape();
 
@@ -314,8 +314,6 @@ public class LogoAbstract {
 
         p5.stroke(0);
         p5.strokeWeight(1);
-
-
 
         p5.popStyle();
     }
