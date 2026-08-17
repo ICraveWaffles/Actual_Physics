@@ -271,6 +271,66 @@ public class LogoAbstract {
         float phase = t * 5f;
 
         p5.noFill();
+        p5.stroke(0);
+        p5.strokeWeight(3);
+
+        p5.beginShape();
+
+        for(float i = 0; i <= 1; i += 0.02f){
+
+            float px = p5.lerp(leftX, rightX, i);
+
+            float py =
+                    y
+                            + waveAmp * (float)Math.sin(i * 20 + phase)
+                            + waveAmp * 0.4f * (float)Math.sin(i * 55 + phase * 1.7f);
+
+            p5.vertex(px, py);
+        }
+
+        p5.endShape();
+
+        p5.strokeWeight(1);
+
+        for(float i = 0; i <= 1; i += 0.05f){
+
+            float px = p5.lerp(leftX, rightX, i);
+
+            float offset =
+                    waveAmp * 0.8f *
+                            (float)Math.sin(i * 30 + phase);
+
+            p5.line(px, y - offset, px + h*0.01f, y + offset);
+        }
+
+
+        p5.rectMode(p5.CENTER);
+
+        p5.strokeWeight(w/20f);
+        p5.stroke(0);
+
+        p5.line(x - w/2.2f, y+h/2.5f, x - w/2.33f, y-h/2.5f);
+        p5.line(x + w/2.33f, y+h/2.5f, x + w/2.2f, y-h/2.5f);
+
+        p5.stroke(0);
+        p5.strokeWeight(1);
+
+        p5.popStyle();
+    }
+
+    private void drawX(PApplet p5, float t, float trans, boolean isBleck){
+
+        p5.pushStyle();
+
+        float ropeLength = w * 0.9f;
+        float waveAmp = h * 0.1f;
+
+        float leftX = x - ropeLength/2f;
+        float rightX = x + ropeLength/2f;
+
+        float phase = t * 5f;
+
+        p5.noFill();
         p5.stroke(trans);
         p5.strokeWeight(3);
 
