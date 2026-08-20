@@ -572,18 +572,18 @@ public class IA extends PApplet {
             textFont(fontTimesBold);
             textSize(28);
             textAlign(CENTER, CENTER);
-            text("COMPARACIÓN: TEORÍA VS EXPERIMENTO", cx, cy - height * 0.38f);
+            text("", cx, cy - height * 0.38f);
 
             float plotW = width * 0.32f;
             float plotH = height * 0.42f;
 
             float leftX = cx - width * 0.36f;
             float leftY = cy - plotH * 0.30f;
-            drawMiniPlot(leftX, leftY, plotW, plotH, "Modelo Teórico (Ideal)", false, stageBeat);
+            drawMiniPlot(leftX, leftY, plotW, plotH, "", false, stageBeat);
 
             float rightX = cx + width * 0.04f;
             float rightY = cy - plotH * 0.30f;
-            drawMiniPlot(rightX, rightY, plotW, plotH, "Datos Experimentales", true, stageBeat);
+            drawMiniPlot(rightX, rightY, plotW, plotH, "", true, stageBeat);
 
         } else {
             float leftCenterX = cx - width * 0.24f;

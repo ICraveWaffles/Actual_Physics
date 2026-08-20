@@ -60,17 +60,32 @@ public class Rig2 extends PApplet {
         float x2 = (0.35f + 0.25f * cos(b * TWO_PI * 0.33f)) * maxHalf;
         float f2Mag = constantTorque / x2;
 
+        // ==========================================
+        // APOYO EN EL CENTRO (FULCRUM)
+        // ==========================================
+        float supportTopY = cy + barHeight / 2f;
+        float supportH = 65f;
+        float supportW = 55f;
+
         stroke(255);
         strokeWeight(3);
         fill(0);
-        ellipse(cx, cy, 22, 22);
+        // Triángulo de apoyo central
+        triangle(cx, supportTopY, cx - supportW / 2f, supportTopY + supportH, cx + supportW / 2f, supportTopY + supportH);
+        // Línea base del suelo del apoyo
+        line(cx - supportW * 0.8f, supportTopY + supportH, cx + supportW * 0.8f, supportTopY + supportH);
 
+        // Barra principal
         stroke(255);
         strokeWeight(3);
         fill(0);
         rectMode(CENTER);
         rect(cx, cy, currentBarLength, barHeight, 4);
 
+        // Perno / Eje de rotación en el centro
+        ellipse(cx, cy, 18, 18);
+
+        // Vectores de fuerza
         pushMatrix();
         translate(cx - x1, cy + barHeight / 2f);
         drawVector(0, 0, 0, f1Mag, "");
@@ -81,13 +96,14 @@ public class Rig2 extends PApplet {
         drawVector(0, 0, 0, f2Mag, "");
         popMatrix();
 
+        // Líneas de acotación
         stroke(255, 130);
         strokeWeight(1);
         line(cx, cy - barHeight / 2f - 30, cx - x1, cy - barHeight / 2f - 30);
         line(cx - x1, cy - barHeight / 2f - 5, cx - x1, cy - barHeight / 2f - 55);
         line(cx, cy - barHeight / 2f - 30, cx + x2, cy - barHeight / 2f - 30);
         line(cx + x2, cy - barHeight / 2f - 5, cx + x2, cy - barHeight / 2f - 55);
-        line(width/2f, cy - barHeight/ 2f-10, width/2f, cy - barHeight / 2f -50);
+        line(width/2f, cy - barHeight/ 2f - 10, width/2f, cy - barHeight / 2f - 50);
 
         popStyle();
     }

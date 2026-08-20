@@ -13,7 +13,7 @@ public class Dyn3 extends PApplet {
 
     public static Alogo alogo;
 
-    float maxBeats = 4f; // 4 beats en total
+    float maxBeats = 4f;
 
     public void draw() {
         pushStyle();
@@ -34,7 +34,6 @@ public class Dyn3 extends PApplet {
         transY = b % 1f;
         logoTransparency = (float) (255 * (-Math.pow(transY, 2) + 2 * (transY)));
         alogo.display(this, b, logoTransparency);
-
 
         float theta = PI / 6f;
         float S = 70;
@@ -93,7 +92,6 @@ public class Dyn3 extends PApplet {
         }
         float v_mag = abs(vy);
 
-
         stroke(255);
         strokeWeight(5);
         line(0, groundY, width, groundY);
@@ -104,17 +102,11 @@ public class Dyn3 extends PApplet {
             line(x, groundY, x + 180, groundY);
         }
 
+        float tankW = (tankRightX - tankLeftX) - 6;
+        float tankX = tankLeftX + 3;
+        float tankY = waterSurfaceY;
 
-        noStroke();
-        fill(0, 140, 230, 130);
-        rectMode(CORNER);
-        rect(tankLeftX + 3, waterSurfaceY, (tankRightX - tankLeftX) - 6, waterH);
-
-
-        stroke(0, 200, 255, 200);
-        strokeWeight(2);
-        line(tankLeftX + 3, waterSurfaceY, tankRightX - 3, waterSurfaceY);
-
+        drawPulsingSquareMarble(tankX, tankY, tankW, waterH, b);
 
         stroke(255);
         strokeWeight(6);
@@ -126,17 +118,14 @@ public class Dyn3 extends PApplet {
         vertex(tankRightX, tankTop - (80 * vScale));
         endShape();
 
-
         rectMode(CENTER);
         pushMatrix();
         translate(px, py);
-
 
         strokeWeight(3);
         stroke(255);
         noFill();
         rect(0, 0, S, S);
-
 
         drawVector(0, 0, 0, -65, color(100, 150, 255), "Fb");
 
@@ -147,6 +136,45 @@ public class Dyn3 extends PApplet {
         }
 
         popMatrix();
+
+        popStyle();
+    }
+
+
+    void drawPulsingSquareMarble(float x, float y, float w, float h, float beats) {
+        pushStyle();
+
+        float cellSize = 80f;
+        int cols = (int) Math.ceil(w / cellSize);
+        int rows = (int) Math.ceil(h / cellSize);
+
+        float s = sin(PI * beats);
+
+        float amplitude = 20f;
+
+        rectMode(CORNER);
+        noStroke();
+
+        for (int i = 0; i < cols; i++) {
+            boolean nextWat = (i % 2 == 0);
+            float bx = x + i * cellSize;
+
+            for (int j = 0; j < rows; j++) {
+                float by = y + j * cellSize;
+
+                float bw = min(cellSize, x + w - bx);
+                float bh = min(cellSize, y + h - by);
+
+                if (bw <= 0 || bh <= 0) continue;
+
+                float val = nextWat ? (96f - amplitude * s) : (96f + amplitude * s);
+
+                fill(val);
+                rect(bx, by, bw, bh);
+
+                nextWat = !nextWat;
+            }
+        }
 
         popStyle();
     }
@@ -194,7 +222,6 @@ public class Dyn3 extends PApplet {
 
     public static void main(String[] args) {
         PApplet.main("Classes.Dyn3");
-        PApplet.main("Classes.Dyn2");
     }
 
     public void mousePressed() {

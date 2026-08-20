@@ -126,7 +126,7 @@ public class EI extends PApplet {
 
     @Override
     public void draw() {
-        background(10);
+        background(0);
 
         globalTime = (millis() * 0.001f) % (BEAT_DURATION * TOTAL_BEATS);
         float currentBeat = globalTime / BEAT_DURATION;

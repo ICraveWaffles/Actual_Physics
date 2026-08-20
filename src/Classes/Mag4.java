@@ -102,12 +102,6 @@ public class Mag4 extends PApplet {
         line(gx, gy + gh + 15f, gx, gy - 25f);
         drawAxisArrow(gx, gy - 25f, -HALF_PI);
 
-        fill(255);
-        textAlign(LEFT, CENTER);
-        textSize(22);
-        text("Φ", gx - 25f, gy - 30f);
-        textAlign(CENTER, TOP);
-        text("t", gx + gw + 30f, gcy - 8f);
 
         stroke(255, 180);
         strokeWeight(2.5f);
@@ -135,7 +129,7 @@ public class Mag4 extends PApplet {
         float tx = (dXdb / len) * tanLen;
         float ty = (dYdb / len) * tanLen;
 
-        stroke(255, 230, 0);
+        stroke(255);
         strokeWeight(3.0f);
         line(curPx - tx, curPy - ty, curPx + tx, curPy + ty);
 
@@ -161,9 +155,6 @@ public class Mag4 extends PApplet {
         noStroke();
         circle(barX, emfY, 7f);
 
-        textAlign(CENTER, BOTTOM);
-        textSize(20);
-        text("E", barX, gcy - barH * 0.5f - 18f);
     }
 
     private void drawCoilHalf(float x, float y, float rx, float ry, boolean isBack, float current, float b) {

@@ -107,9 +107,8 @@ public class Har1 extends PApplet {
     }
 
     void drawHarmonicCurve(float graphX, float centerY, float gW, float gH, float currentT, int type, float freq) {
-        if (type == 1) stroke(255, 200, 100);
-        else if (type == 2) stroke(100, 220, 255);
-        else if (type == 3) stroke(255, 100, 150);
+
+       stroke(255);
 
         strokeWeight(2);
         noFill();

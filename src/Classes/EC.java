@@ -23,7 +23,7 @@ public class EC extends PApplet {
             t = 0;
         }
 
-        background(15);
+        background(0);
 
         float b = t * w;
 
@@ -34,11 +34,17 @@ public class EC extends PApplet {
         float cy = height * 0.50f;
 
         pushMatrix();
+        pushStyle();
         drawScene(b, cx, cy);
+        popStyle();
         popMatrix();
 
         if (elogo != null) {
+            pushMatrix();
+            pushStyle();
             elogo.display(this, b, logoTransparency);
+            popStyle();
+            popMatrix();
         }
 
         popStyle();
@@ -131,9 +137,9 @@ public class EC extends PApplet {
         } else {
             float localB = b - 2.0f;
 
-            float p1 = 0.25f;
-            float p2 = 1;
-            float p3 = 1.75f;
+            float p1 = 0.50f;
+            float p2 = 1.00f;
+            float p3 = 1.50f;
 
             boolean showTrans13 = localB >= p1;
             boolean showTrans32 = localB >= p2;
@@ -285,25 +291,38 @@ public class EC extends PApplet {
             pushMatrix();
             translate(0, 250);
 
-            noStroke();
-            fill(255);
+            float barX1 = -480f;
+            float barX2 = 480f;
+            float barY1 = 100f;
+            float barY2 = 140f;
+
+            for (float x = barX1; x <= barX2; x += 1.5f) {
+                float inter = map(x, barX1, barX2, 15, 255);
+                stroke(inter);
+                strokeWeight(2f);
+                line(x, barY1, x, barY2);
+            }
+
+            noFill();
+            stroke(255);
+            strokeWeight(2f);
             rectMode(CORNERS);
-            rect(-480, 100, 480, 140);
+            rect(barX1, barY1, barX2, barY2);
 
             if (localB >= p1 + 0.1f) {
                 stroke(0);
                 strokeWeight(4.5f);
-                line(-360, 100, -360, 140);
+                line(-360, barY1, -360, barY2);
             }
             if (localB >= p2 + 0.1f) {
-                stroke(0);
+                stroke(255);
                 strokeWeight(4.5f);
-                line(-180, 100, -180, 140);
+                line(-180, barY1, -180, barY2);
             }
             if (localB >= p3 + 0.1f) {
-                stroke(0);
+                stroke(255);
                 strokeWeight(4.5f);
-                line(260, 100, 260, 140);
+                line(260, barY1, 260, barY2);
             }
 
             popMatrix();

@@ -81,8 +81,8 @@ public class Mag2 extends PApplet {
         drawMagneticField(xLeft, cy, dirL, fieldRotationAngle, 1.0f);
         drawMagneticField(xRight, cy, dirR, fieldRotationAngle, intensityR);
 
-        drawWireWithCurrent(xLeft, topCutY, bottomCutY, phaseL, 1.0f);
-        drawWireWithCurrent(xRight, topCutY, bottomCutY, phaseR, intensityR);
+        drawWireWithCurrent(xLeft, topCutY, bottomCutY, phaseL, dirL, 1.0f);
+        drawWireWithCurrent(xRight, topCutY, bottomCutY, phaseR, dirR, intensityR);
 
         if (b >= 2.0f) {
             float forceMag = 110f * cos(PI * (b - 2.0f));
@@ -93,7 +93,7 @@ public class Mag2 extends PApplet {
         drawEnclosures(topCutY, bottomCutY);
     }
 
-    private void drawWireWithCurrent(float x, float topY, float bottomY, float phase, float intensityFactor) {
+    private void drawWireWithCurrent(float x, float topY, float bottomY, float phase, float dir, float intensityFactor) {
         strokeCap(ROUND);
 
         stroke(50);
@@ -128,6 +128,31 @@ public class Mag2 extends PApplet {
                 stroke(255, 255 * intensity * intensityFactor);
                 strokeWeight(4 * intensity + 1);
                 line(x, y, x, y + 3f);
+            }
+        }
+
+        // Current direction arrows
+        float alpha = 255f * intensityFactor;
+        if (alpha > 5f) {
+            float wireLen = bottomY - topY;
+            int numArrows = 4;
+            float arrowSpacing = wireLen / numArrows;
+            float moveOffset = (phase * speed) % wireLen;
+            float angle = (dir >= 0) ? -HALF_PI : HALF_PI;
+
+            for (int i = 0; i < numArrows; i++) {
+                float y = topY + i * arrowSpacing - moveOffset;
+                float distFromTop = (y - topY) % wireLen;
+                if (distFromTop < 0) distFromTop += wireLen;
+                float arrowY = topY + distFromTop;
+
+                pushMatrix();
+                translate(x, arrowY);
+                rotate(angle);
+                fill(255, alpha);
+                noStroke();
+                triangle(14, 0, -12, 10, -12, -10);
+                popMatrix();
             }
         }
     }

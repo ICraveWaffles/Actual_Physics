@@ -6,8 +6,8 @@ public class Ast4 extends PApplet {
 
     private final float BEAT_DURATION = 0.6f;
     private final float BEATS_PER_STAGE = 4f;
-    private final float TOTAL_STAGES = 3f; // Extendida a 3 etapas (12 beats en total)
-    private final float TOTAL_BEATS = BEATS_PER_STAGE * TOTAL_STAGES; // 12 beats
+    private final float TOTAL_STAGES = 3f;
+    private final float TOTAL_BEATS = BEATS_PER_STAGE * TOTAL_STAGES;
     private final float CYCLE_TIME = TOTAL_BEATS * BEAT_DURATION;
 
     private float globalTime = 0;
@@ -17,7 +17,6 @@ public class Ast4 extends PApplet {
     float logoTransparency;
     float transY;
 
-    // Partículas y estrellas
     private final int NUM_STARS = 150;
     private float[] starX = new float[NUM_STARS];
     private float[] starY = new float[NUM_STARS];
@@ -52,7 +51,7 @@ public class Ast4 extends PApplet {
 
     @Override
     public void draw() {
-        background(0); // Fondo negro puro
+        background(0);
 
         if (startTimeSec < 0) {
             startTimeSec = millis() * 0.001f;
@@ -65,10 +64,8 @@ public class Ast4 extends PApplet {
         float b = timeSec * (100f / 60f);
         transY = b % 1f;
 
-        // Transparencia base del logo
         float baseAlpha = (float) (255 * (-Math.pow(transY, 2) + 2 * (transY)));
 
-        // Desvanecimiento del Elogo en los últimos 4 beats (Beats 8.0 a 12.0)
         if (currentBeat >= 8.0f) {
             float logoFade = map(currentBeat, 8.0f, 12.0f, 1.0f, 0.0f);
             logoFade = constrain(logoFade, 0f, 1f);
@@ -93,16 +90,13 @@ public class Ast4 extends PApplet {
         float centerY = height * 0.5f;
 
         if (beat < 4.0f) {
-            // BEATS 0 - 3: Inflación primordial
             float inflationProg = beat / 4.0f;
             drawInflationPhase(centerX, centerY, inflationProg, t);
         } else if (beat < 6.0f) {
-            // BEATS 4 - 5: Desdoblamiento en 3 geometrías
             float splitRaw = map(beat, 4.0f, 6.0f, 0f, 1f);
             float splitProg = smoothStep(splitRaw);
             drawThreeGeometries(centerX, centerY, splitProg, t);
         } else {
-            // BEATS 6 - 11 (6 Beats de duración): Evolución a los 3 finales
             float endRaw = map(beat, 6.0f, 12.0f, 0f, 1f);
             float endProg = smoothStep(endRaw);
             drawThreeEndings(centerX, centerY, endProg, beat, t);
@@ -111,9 +105,6 @@ public class Ast4 extends PApplet {
         popStyle();
     }
 
-    // ==========================================
-    // ETAPA 1: INFLACIÓN (Beats 0-3)
-    // ==========================================
     private void drawInflationPhase(float cx, float cy, float prog, float t) {
         pushMatrix();
         translate(cx, cy);
@@ -159,28 +150,17 @@ public class Ast4 extends PApplet {
         popMatrix();
     }
 
-    // ==========================================
-    // ETAPA 2: 3 GEOMETRÍAS (Beats 4-5)
-    // ==========================================
     private void drawThreeGeometries(float cx, float cy, float splitProg, float t) {
         float offX = lerp(0f, width * 0.31f, splitProg);
 
         float alpha = map(splitProg, 0f, 0.3f, 100f, 255f);
         alpha = constrain(alpha, 0, 255);
 
-        // 1. Plana (k = 0)
         drawFlatUniverse3D(cx - offX, cy, t, alpha, "PLANA (k = 0)");
-
-        // 2. Silla de Montar / Abierta (k < 0)
         drawSaddleUniverse3D(cx, cy, t, alpha, "HIPERBÓLICA (k < 0)");
-
-        // 3. Esférica / Cerrada (k > 0)
         drawSphericalUniverse3D(cx + offX, cy, t, alpha, "ESFÉRICA (k > 0)");
     }
 
-    // ==========================================
-    // ETAPA 3: 3 FINALES EVOLUTIVOS (Beats 6-11)
-    // ==========================================
     private void drawThreeEndings(float cx, float cy, float endProg, float currentBeat, float t) {
         float offX = width * 0.31f;
 
@@ -189,9 +169,6 @@ public class Ast4 extends PApplet {
         drawBigCrunch(cx + offX, cy, endProg, currentBeat, t);
     }
 
-    // ----------------------------------------------------
-    // RENDERS BASE DE LAS GEOMETRÍAS 3D
-    // ----------------------------------------------------
     private void drawFlatUniverse3D(float x, float y, float t, float alpha, String label) {
         pushMatrix();
         translate(x, y);
@@ -300,16 +277,12 @@ public class Ast4 extends PApplet {
         popMatrix();
     }
 
-    // ----------------------------------------------------
-    // FINALES EXTENDIDOS CON FADE OUT EN LOS ÚLTIMOS 4 BEATS
-    // ----------------------------------------------------
     private void drawBigFreeze(float x, float y, float prog, float beat, float t) {
         pushMatrix();
         translate(x, y);
 
         float freezeScale = lerp(1.0f, 2.8f, prog);
 
-        // Desvanecimiento en los últimos 4 beats (beat >= 8.0)
         float alpha = 215f;
         if (beat >= 8.0f) {
             alpha = map(beat, 8.0f, 12.0f, 215f, 0f);
@@ -366,7 +339,6 @@ public class Ast4 extends PApplet {
         pushMatrix();
         translate(x, y);
 
-        // Desvanecimiento progresivo en los últimos 4 beats (Beats 8.0 a 12.0)
         float alpha = 255f;
         if (beat >= 8.0f) {
             alpha = map(beat, 8.0f, 12.0f, 255f, 0f);
@@ -382,7 +354,6 @@ public class Ast4 extends PApplet {
         float rotY = t * 0.4f;
 
         int steps = 12;
-        // El rasgado sigue creciendo de manera acelerada a lo largo de todo el tiempo
         float ripIntensity = (float) Math.pow(prog, 2.5f);
 
         for (int i = -steps; i <= steps; i++) {
@@ -395,7 +366,6 @@ public class Ast4 extends PApplet {
 
                 float[] pt = project3D(u * size, z, v * size, rotX, rotY);
 
-                // Desplazamiento caótico progresivo de desgarro en continua expansión
                 if (prog > 0.01f) {
                     float distFromCenter = dist(0, 0, pt[0], pt[1]);
                     float angle = atan2(pt[1], pt[0]);
@@ -436,7 +406,6 @@ public class Ast4 extends PApplet {
         pushMatrix();
         translate(x, y);
 
-        // La esfera 3D colapsa hacia el centro
         float radius = lerp(110f, 1f, (float) Math.pow(prog, 1.5f));
 
         float alpha = 255f;
@@ -450,7 +419,7 @@ public class Ast4 extends PApplet {
         noFill();
 
         float rotX = 0.4f;
-        float rotY = t * (0.5f + prog * 5.0f); // Giro acelerado constante durante el colapso
+        float rotY = t * (0.5f + prog * 5.0f);
 
         int rings = 8;
         for (int i = 0; i <= rings; i++) {
@@ -468,7 +437,6 @@ public class Ast4 extends PApplet {
             endShape();
         }
 
-        // Destello de singularidad durante el colapso final
         if (prog > 0.6f) {
             float flashAlpha = alpha;
             if (beat >= 8.0f) {

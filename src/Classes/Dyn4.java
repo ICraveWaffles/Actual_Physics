@@ -106,7 +106,7 @@ public class Dyn4 extends PApplet {
 
         if (b >= 4.0f) {
             noStroke();
-            fill(0, 140, 255, 30);
+            fill(255, 30);
             arc(cx, cy, R * 2, R * 2, 0, phi % TWO_PI);
 
             stroke(255, 40);

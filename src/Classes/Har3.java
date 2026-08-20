@@ -55,14 +55,14 @@ public class Har3 extends PApplet {
 
         for (float x = startX; x <= endX; x += waveLen / 64f) {
             float y = transY0 - ampTrans * sin(k * (x - startX) - phase);
-            fill(100, 220, 255);
+            fill(255);
             noStroke();
             circle(x, y, 6);
         }
 
         float trackX_T = startX + waveLen * 0.75f;
         float trackY_T = transY0 - ampTrans * sin(k * (trackX_T - startX) - phase);
-        fill(255, 100, 100);
+        fill(255);
         circle(trackX_T, trackY_T, 12);
 
         float crestX = startX + waveLen * 0.25f;
@@ -92,7 +92,7 @@ public class Har3 extends PApplet {
 
             for (int r = 0; r < rows; r++) {
                 float y = longY0 + (r - (rows - 1) / 2f) * rowSpacing;
-                fill(255, 200, 100);
+                fill(255);
                 noStroke();
                 circle(actualX, y, 5);
             }
@@ -100,7 +100,7 @@ public class Har3 extends PApplet {
 
         float trackX_L0 = startX + waveLen * 0.75f;
         float trackX_L = trackX_L0 + ampLong * sin(k * (trackX_L0 - startX) - phase);
-        fill(255, 100, 100);
+        fill(255);
         circle(trackX_L, longY0, 12);
 
         float compPhaseX = startX + waveLen * 0.75f;

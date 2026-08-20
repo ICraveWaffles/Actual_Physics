@@ -5,21 +5,18 @@ import java.util.ArrayList;
 
 public class Rel3 extends PApplet {
 
-    // --- Configuración de Tiempos y Beats ---
-    private final float BEAT_DURATION = 0.6f; // 100 BPM
-    private final float BEATS_PER_STAGE = 4f; // 4 beats por ciclo
+    private final float BEAT_DURATION = 0.6f;
+    private final float BEATS_PER_STAGE = 4f;
     private final float TOTAL_STAGES = 1f;
     private final float TOTAL_BEATS = BEATS_PER_STAGE * TOTAL_STAGES;
 
     private float globalTime = 0;
     private float startTimeSec = -1;
 
-    // --- Sistemas de Partículas y Eventos ---
-    private ArrayList<Particle> particlesRel;  // Estela relativista
-    private ArrayList<Particle> particlesClass; // Estela clásica
+    private ArrayList<Particle> particlesRel;
+    private ArrayList<Particle> particlesClass;
     private ArrayList<RandomEvent> randomEvents;
 
-    // --- Logo y Transiciones ---
     public static Alogo alogo;
     float logoTransparency;
     float transY;
@@ -48,7 +45,7 @@ public class Rel3 extends PApplet {
 
     @Override
     public void draw() {
-        background(0); // Fondo negro monocromático
+        background(0);
 
         if (startTimeSec < 0) {
             startTimeSec = millis() * 0.001f;
@@ -67,10 +64,8 @@ public class Rel3 extends PApplet {
 
         float localProgress = (currentBeat % BEATS_PER_STAGE) / BEATS_PER_STAGE;
 
-        // Dibujar escenario con la cámara centrada en X sobre la partícula relativista
         drawAccelerationStage(centerX, centerY, localProgress, timeSec);
 
-        // Actualizar y dibujar logo Alogo
         if (alogo != null) {
             alogo.display(this, b, logoTransparency);
         }
@@ -85,49 +80,36 @@ public class Rel3 extends PApplet {
         float marginBottom = height * 0.15f;
         float usableH = height - marginTop - marginBottom;
 
-        // --- ACELERACIÓN EXTREMA ---
-        // Curva de aceleración masiva no lineal (T crece exponencialmente)
         float T = pow(progress * 3.2f, 2.6f);
 
-        // Cálculos de Relatividad Especial
         float gamma = sqrt(1.0f + T * T);
-        float v_rel = T / gamma; // Tiende asintóticamente a 1.0c
-        float K_rel = gamma - 1.0f; // Energía cinética masiva
+        float v_rel = T / gamma;
+        float K_rel = gamma - 1.0f;
 
-        // Posiciones absolutas en coordenadas del mundo
         float worldStartX = cx - width * 0.5f;
         float scaleFactor = width * 1.8f;
 
-        // Posición mundo de la partícula relativista
         float x_rel_world = worldStartX + (sqrt(1.0f + T * T) - 1.0f) * (scaleFactor * 0.25f);
-
-        // Posición mundo de la partícula clásica (desborda sin límite de C)
         float x_clas_world = worldStartX + (0.5f * T * T) * (scaleFactor * 0.12f);
 
         float y_rel = marginTop + usableH * 0.28f;
         float y_clas = marginTop + usableH * 0.72f;
 
-        // --- CÁMARA DINÁMICA CENTRADA EN X ---
-        // La cámara sigue a la partícula relativista manteniéndola exactamente en el centro (50% de la pantalla)
         float camX = x_rel_world - width * 0.5f;
 
-        // --- DIBUJO DEL MUNDO DE SIMULACIÓN (CON CÁMARA) ---
         pushMatrix();
-        translate(-camX, 0); // Transformación de la cámara
+        translate(-camX, 0);
 
-        // 1. Pistas de aceleración extendidas
         stroke(255, 30);
         strokeWeight(1f);
         drawDashedLine(worldStartX - 3000f, y_rel, x_rel_world + 4000f, y_rel, 6f);
         drawDashedLine(worldStartX - 3000f, y_clas, x_clas_world + 4000f, y_clas, 6f);
 
-        // Grid o marcas de distancia en el espacio-tiempo
         for (float gx = worldStartX - 2000f; gx < x_clas_world + 4000f; gx += 200f) {
             stroke(255, 15);
             line(gx, y_rel - 15, gx, y_clas + 15);
         }
 
-        // Línea simbólica del límite C (se desplaza respecto a la cámara)
         float cLimitWorldX = worldStartX + scaleFactor * 0.75f;
         float cGlow = 180 + sin(frameCount * 0.12f) * 40;
         stroke(255, cGlow);
@@ -139,7 +121,6 @@ public class Rel3 extends PApplet {
         textAlign(CENTER, TOP);
         text("LÍMITE C", cLimitWorldX, y_clas + 70f);
 
-        // 2. Partícula Clásica (No Relativista)
         float m0 = 10f;
         float r_clas = m0 * 2.0f;
 
@@ -153,11 +134,8 @@ public class Rel3 extends PApplet {
         fill(255, 240);
         ellipse(x_clas_world, y_clas, r_clas, r_clas);
 
-        // 3. Partícula Relativista (Crecimiento de masa y vibración extrema)
-        // El tamaño de la partícula crece con el factor gamma (Crecimiento de masa)
         float r_rel = m0 * 2.0f * (1.0f + log(gamma + 1.0f) * 1.8f);
 
-        // Temblor extremo generado por la energía cinética K_rel
         float A_tremble = min(35.0f, 1.5f * K_rel);
         float y_tremble = A_tremble * sin(frameCount * 0.6f * sqrt(gamma));
         float x_tremble = (A_tremble * 0.4f) * cos(frameCount * 0.8f * sqrt(gamma));
@@ -169,7 +147,6 @@ public class Rel3 extends PApplet {
             particlesRel.add(new Particle(finalRelX, finalRelY, random(-0.8f, 0.8f) * K_rel, random(-0.8f, 0.8f) * K_rel, m0 * 0.4f * log(gamma + 1f)));
         }
 
-        // Núcleo y halo relativista masivo
         noStroke();
         fill(255, max(10, 80 - gamma));
         ellipse(finalRelX, finalRelY, r_rel * 2.5f, r_rel * 2.5f);
@@ -178,10 +155,9 @@ public class Rel3 extends PApplet {
         fill(255, 250);
         ellipse(finalRelX, finalRelY, r_rel, r_rel);
 
-        // Actualizar e interactuar con partículas dentro del sistema de la cámara
         updateAndDisplayParticles(this);
 
-        popMatrix(); // Fin de transformaciones de la cámara
+        popMatrix();
 
         popStyle();
     }
@@ -223,8 +199,6 @@ public class Rel3 extends PApplet {
             if (pt.isDead()) particlesClass.remove(i);
         }
     }
-
-    // --- CLASES INTERNAS ---
 
     class RandomEvent {
         float x, y, life;

@@ -35,7 +35,6 @@ public class Dyn2 extends PApplet {
         logoTransparency = (float) (255 * (-Math.pow(transY, 2) + 2 * (transY)));
         alogo.display(this, b, logoTransparency);
 
-
         float theta = PI / 6f;
         float S = 70;
 
@@ -162,14 +161,11 @@ public class Dyn2 extends PApplet {
         float tankLeftX = tankLeft - 100;
         float tankRightX = tankRight - 100;
 
-        noStroke();
-        fill(0, 140, 230, 130);
-        rectMode(CORNER);
-        rect(tankLeftX + 3, groundY - waterH, (tankRightX - tankLeftX) - 6, waterH);
+        float tankW = (tankRightX - tankLeftX) - 6;
+        float tankX = tankLeftX + 3;
+        float tankY = groundY - waterH;
 
-        stroke(0, 200, 255, 200);
-        strokeWeight(2);
-        line(tankLeftX + 3, groundY - waterH, tankRightX - 3, groundY - waterH);
+        drawPulsingSquareMarble(tankX, tankY, tankW, waterH, b);
 
         stroke(255);
         strokeWeight(6);
@@ -181,7 +177,6 @@ public class Dyn2 extends PApplet {
         vertex(tankRightX, tankTop - (80 * vScale));
         endShape();
 
-
         rectMode(CENTER);
 
         pushMatrix();
@@ -189,7 +184,6 @@ public class Dyn2 extends PApplet {
         rotate(currentAngle);
         scale(scaleW, scaleH);
 
-        // Cubo Transparente (Sin Relleno)
         strokeWeight(3);
         stroke(255);
         noFill();
@@ -236,6 +230,45 @@ public class Dyn2 extends PApplet {
 
         drawEnergyBar(uiX, uiY, barWidth, currentKE * scaleE, barMaxHeight, 255, "");
         drawEnergyBar(uiX + spacing, uiY, barWidth, currentPE * scaleE, barMaxHeight, 255, "");
+
+        popStyle();
+    }
+
+
+    void drawPulsingSquareMarble(float x, float y, float w, float h, float beats) {
+        pushStyle();
+
+        float cellSize = 80f;
+        int cols = (int) Math.ceil(w / cellSize);
+        int rows = (int) Math.ceil(h / cellSize);
+
+        float s = sin(PI * beats);
+
+        float amplitude = 20f;
+
+        rectMode(CORNER);
+        noStroke();
+
+        for (int i = 0; i < cols; i++) {
+            boolean nextWat = (i % 2 == 0);
+            float bx = x + i * cellSize;
+
+            for (int j = 0; j < rows; j++) {
+                float by = y + j * cellSize;
+
+                float bw = min(cellSize, x + w - bx);
+                float bh = min(cellSize, y + h - by);
+
+                if (bw <= 0 || bh <= 0) continue;
+
+                float val = nextWat ? (96f - amplitude * s) : (96f + amplitude * s);
+
+                fill(val);
+                rect(bx, by, bw, bh);
+
+                nextWat = !nextWat;
+            }
+        }
 
         popStyle();
     }

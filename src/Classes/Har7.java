@@ -1,13 +1,12 @@
 package Classes;
 
 import processing.core.PApplet;
-import processing.core.PFont;
+import java.util.ArrayList;
 
 public class Har7 extends PApplet {
 
     float t = 0;
     float w = 100f / 120f;
-    PFont ntr;
     float logoTransparency;
     float transY;
 
@@ -29,14 +28,9 @@ public class Har7 extends PApplet {
         background(0);
 
         float b = t * w;
-        textFont(ntr);
 
         transY = b % 1f;
         logoTransparency = (float) (255 * (-Math.pow(transY, 2) + 2 * (transY)));
-
-        if (clogo != null) {
-            clogo.display(this, b, logoTransparency);
-        }
 
         float cx = width * 0.5f;
         float cy = height * 0.5f;
@@ -45,7 +39,6 @@ public class Har7 extends PApplet {
         float boxH = height * 0.50f;
         float halfW = boxW * 0.5f;
         float halfH = boxH * 0.5f;
-
 
         float p1 = constrain(b / 2.0f, 0, 1);
         float p2 = constrain((b - 2.0f) / 2.0f, 0, 1);
@@ -128,6 +121,10 @@ public class Har7 extends PApplet {
 
         popMatrix();
 
+        if (clogo != null) {
+            clogo.display(this, b, logoTransparency);
+        }
+
         popStyle();
     }
 
@@ -137,8 +134,6 @@ public class Har7 extends PApplet {
     }
 
     public void setup() {
-        ntr = createFont("times.ttf", 50);
-
         float finalX = (width / 2f) + 865.3f;
         float finalY = (height / 2f) - 458.1f;
         float finalW = (height / 2f) - 381.75f;

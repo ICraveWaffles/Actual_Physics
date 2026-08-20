@@ -98,7 +98,7 @@ public class Kin1 extends PApplet {
         float trackX = x + trackDistance * cos(angle);
         float trackY = y + trackDistance * sin(angle);
 
-        fill(255, 0, 0);
+        fill(255);
         noStroke();
         circle(trackX, trackY, 16);
 

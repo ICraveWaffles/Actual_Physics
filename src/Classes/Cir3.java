@@ -13,7 +13,6 @@ public class Cir3 extends PApplet {
 
     public static Blogo blogo;
 
-    // 8 beats en total (4 para Cir3 + 4 para Cir4)
     float cycleTime = 9.6f;
 
     public void draw() {
@@ -28,40 +27,40 @@ public class Cir3 extends PApplet {
 
         background(0);
 
-        // 'b' va de 0.0 a 8.0
         float b = t * w;
 
-        // Transparencia del logo basada en el ritmo
         transY = b % 1f;
         logoTransparency = (float) (255 * (-Math.pow(transY, 2) + 2 * (transY)));
 
-        // Desplazamos el circuito hacia la derecha (62%) para dar mucho espacio al gráfico
         float cx = width * 0.62f;
         float cy = height * 0.50f;
 
         pushMatrix();
+        pushStyle();
         drawScene(b, cx, cy);
+        popStyle();
         popMatrix();
 
         if (blogo != null) {
+            pushMatrix();
+            pushStyle();
             blogo.display(this, b, logoTransparency);
+            popStyle();
+            popMatrix();
         }
 
         popStyle();
     }
 
     private void drawScene(float b, float cx, float cy) {
-        // Recintos más grandes (18% de la pantalla arriba y abajo) para el logo B
         float topCutY = height * 0.18f;
         float bottomCutY = height * 0.82f;
 
-        // --- COORDENADAS GLOBALES DEL CIRCUITO (Escala Expandida) ---
         float topY = cy - 230f;
         float xStart = cx - 380f;
         float xJoin = cx + 380f;
         float xSplit = cx + 40f;
 
-        // Posiciones de los componentes (Más separados para rellenar la pantalla)
         float comp1X = cx - 170f;
         float comp2X = cx + 210f;
         float comp2Y = cy - 110f;
@@ -72,13 +71,9 @@ public class Cir3 extends PApplet {
         float batteryX = cx + 80f;
 
         if (b < 4.0f) {
-            // ==========================================
-            // FASE 1: CIR 3 (RESISTENCIAS) - Beats 0 a 4
-            // ==========================================
             float localB = b;
             float transition = constrain(map(localB, 1.8f, 2.2f, 0f, 1f), 0f, 1f);
 
-            // Zoom inicial adaptado a las resistencias más grandes
             float zoom = lerp(1.8f, 1.0f, transition);
 
             pushMatrix();
@@ -89,24 +84,19 @@ public class Cir3 extends PApplet {
             float resHalfW = 65f;
             float currentVal = 1.0f;
 
-            // Cableado Principal
             drawWireWithCurrent(xJoin, topY, batteryX + 40f, topY, currentVal, localB);
             drawBatteryHorizontal(batteryX, topY);
             drawWireWithCurrent(batteryX - 40f, topY, switchX + 35f, topY, currentVal, localB);
             drawSwitch(switchX, topY, false);
             drawWireWithCurrent(switchX - 35f, topY, xStart, topY, currentVal, localB);
 
-            // Borde izquierdo
             drawWireWithCurrent(xStart, topY, xStart, cy, currentVal, localB);
 
-            // Hacia R1
             drawWireWithCurrent(xStart, cy, comp1X - resHalfW, cy, currentVal, localB);
 
             if (transition > 0.01f) {
-                // R1 hacia bifurcación
                 drawWireWithCurrent(comp1X + resHalfW, cy, xSplit, cy, currentVal, localB);
 
-                // Ramas Paralelas
                 drawWireWithCurrent(xSplit, cy, xSplit, comp2Y, currentVal * 0.5f, localB);
                 drawWireWithCurrent(xSplit, comp2Y, comp2X - resHalfW, comp2Y, currentVal * 0.5f, localB);
                 drawWireWithCurrent(comp2X + resHalfW, comp2Y, xJoin, comp2Y, currentVal * 0.5f, localB);
@@ -115,7 +105,6 @@ public class Cir3 extends PApplet {
                 drawWireWithCurrent(xSplit, comp3Y, comp3X - resHalfW, comp3Y, currentVal * 0.5f, localB);
                 drawWireWithCurrent(comp3X + resHalfW, comp3Y, xJoin, comp3Y, currentVal * 0.5f, localB);
 
-                // Cierre ramas paralelas
                 drawWireWithCurrent(xJoin, comp2Y, xJoin, cy, currentVal * 0.5f, localB);
                 drawWireWithCurrent(xJoin, comp3Y, xJoin, cy, currentVal * 0.5f, localB);
 
@@ -125,10 +114,8 @@ public class Cir3 extends PApplet {
                 drawWireWithCurrent(comp1X + resHalfW, cy, xJoin, cy, currentVal, localB);
             }
 
-            // Borde derecho
             drawWireWithCurrent(xJoin, cy, xJoin, topY, currentVal, localB);
 
-            // Componentes
             drawFloatingResistor(comp1X, cy, localB, 0.0f, 255);
             if (transition > 0.01f) {
                 drawFloatingResistor(comp2X, comp2Y, localB, 1.5f, transition * 255);
@@ -138,9 +125,6 @@ public class Cir3 extends PApplet {
             popMatrix();
 
         } else {
-            // ===========================================
-            // FASE 2: CIR 4 (CAPACITADORES) - Beats 4 a 8
-            // ===========================================
             float localB = b - 4.0f;
             boolean isOpen = (localB < 2.0f);
 
@@ -155,12 +139,10 @@ public class Cir3 extends PApplet {
                 currentVal = -exp(-(localB - 2.0f) * 2.5f);
             }
 
-            // Zoom masivo en el último medio beat (3.5 a 4.0)
             float zoomProgress = constrain(map(localB, 3.5f, 4.0f, 0f, 1f), 0f, 1f);
             zoomProgress = (float) Math.pow(zoomProgress, 4);
             float zoom = lerp(1.0f, 35f, zoomProgress);
 
-            // Gráfico MUY ancho ocupando toda la parte izquierda
             float graphW = width * 0.28f;
             float graphH = height * 0.45f;
             float graphX = width * 0.04f;
@@ -174,21 +156,17 @@ public class Cir3 extends PApplet {
 
             float capHalfW = 26f;
 
-            // Cableado Principal
             drawWireWithCurrent(xJoin, topY, batteryX + 40f, topY, currentVal, localB);
             drawBatteryHorizontal(batteryX, topY);
             drawWireWithCurrent(batteryX - 40f, topY, switchX + 35f, topY, currentVal, localB);
             drawSwitch(switchX, topY, isOpen);
             drawWireWithCurrent(switchX - 35f, topY, xStart, topY, currentVal, localB);
 
-            // Borde izquierdo
             drawWireWithCurrent(xStart, topY, xStart, cy, currentVal, localB);
 
-            // Hacia C1
             drawWireWithCurrent(xStart, cy, comp1X - capHalfW, cy, currentVal, localB);
             drawWireWithCurrent(comp1X + capHalfW, cy, xSplit, cy, currentVal, localB);
 
-            // Ramas Paralelas (C2 y C3)
             drawWireWithCurrent(xSplit, cy, xSplit, comp2Y, currentVal * 0.5f, localB);
             drawWireWithCurrent(xSplit, comp2Y, comp2X - capHalfW, comp2Y, currentVal * 0.5f, localB);
             drawWireWithCurrent(comp2X + capHalfW, comp2Y, xJoin, comp2Y, currentVal * 0.5f, localB);
@@ -197,17 +175,14 @@ public class Cir3 extends PApplet {
             drawWireWithCurrent(xSplit, comp3Y, comp3X - capHalfW, comp3Y, currentVal * 0.5f, localB);
             drawWireWithCurrent(comp3X + capHalfW, comp3Y, xJoin, comp3Y, currentVal * 0.5f, localB);
 
-            // Cierre ramas paralelas
             drawWireWithCurrent(xJoin, comp2Y, xJoin, cy, currentVal * 0.5f, localB);
             drawWireWithCurrent(xJoin, comp3Y, xJoin, cy, currentVal * 0.5f, localB);
 
             drawNode(xSplit, cy, 255);
             drawNode(xJoin, cy, 255);
 
-            // Borde derecho
             drawWireWithCurrent(xJoin, cy, xJoin, topY, currentVal, localB);
 
-            // Componentes Capacitadores
             drawFloatingCapacitor(comp1X, cy, chargeLevel, localB, 0.0f, 255);
             drawFloatingCapacitor(comp2X, comp2Y, chargeLevel, localB, 1.5f, 255);
             drawFloatingCapacitor(comp3X, comp3Y, chargeLevel, localB, 3.0f, 255);
@@ -215,7 +190,6 @@ public class Cir3 extends PApplet {
             popMatrix();
         }
 
-        // Enclosures al final
         drawEnclosures(topCutY, bottomCutY);
     }
 
@@ -227,7 +201,6 @@ public class Cir3 extends PApplet {
         float floatY = y + sin(b * TWO_PI * 0.8f + phase) * 8f;
         translate(x, floatY);
 
-        // Resistencias aumentadas de tamaño para evitar espacios vacíos
         float bodyW = 130f;
         float bodyH = 46f;
 
@@ -270,7 +243,6 @@ public class Cir3 extends PApplet {
         float floatY = y + sin(b * TWO_PI * 0.8f + phase) * 6f;
         translate(x, floatY);
 
-        // Capacitadores aumentados
         float plateH = 80f;
         float plateW = 10f;
         float gap = 32f;
@@ -282,7 +254,7 @@ public class Cir3 extends PApplet {
 
         if (charge > 0.05f) {
             noStroke();
-            fill(200, 200, 0, 90 * charge * (alpha / 255f));
+            fill(255, 90 * charge * (alpha / 255f));
             rectMode(CENTER);
             rect(0, 0, gap + 30f, plateH + 20f, 12f);
         }
@@ -296,7 +268,7 @@ public class Cir3 extends PApplet {
 
         if (charge > 0.02f) {
             noStroke();
-            fill(200, 200, 0, 230 * charge * (alpha / 255f));
+            fill(255, 230 * charge * (alpha / 255f));
             for (float py = -plateH / 2f + 10; py <= plateH / 2f - 10; py += 15) {
                 circle(-gap / 2f - 1.5f, py, 6.5f);
                 circle(gap / 2f + 1.5f, py, 6.5f);
@@ -376,12 +348,12 @@ public class Cir3 extends PApplet {
         float currentY = gy + gh - (currentCharge * (gh - 25f));
 
         noStroke();
-        fill(200, 200, 0, 100);
+        fill(255, 100);
         circle(gx + currentX, currentY, 20);
-        fill(200, 200, 0, 255);
+        fill(255, 255);
         circle(gx + currentX, currentY, 10);
 
-        stroke(200, 200, 0, 90);
+        stroke(255, 90);
         strokeWeight(2f);
         line(gx + currentX, gy + gh, gx + currentX, currentY);
 
@@ -393,7 +365,6 @@ public class Cir3 extends PApplet {
         pushStyle();
         strokeCap(SQUARE);
 
-        // Cables más gruesos
         stroke(40); strokeWeight(14); line(x1, y1, x2, y2);
         stroke(100); strokeWeight(8); line(x1, y1, x2, y2);
         stroke(180); strokeWeight(2f); line(x1, y1, x2, y2);
@@ -413,10 +384,10 @@ public class Cir3 extends PApplet {
                     float px = lerp(x1, x2, tFactor);
                     float py = lerp(y1, y2, tFactor);
 
-                    fill(200, 200, 0, 130 * absCurr);
+                    fill(255, 130 * absCurr);
                     circle(px, py, 16 * absCurr + 3);
 
-                    fill(200, 200, 0, 240 * absCurr);
+                    fill(255, 240 * absCurr);
                     circle(px, py, 6 * absCurr + 1);
                 }
             }
@@ -438,7 +409,7 @@ public class Cir3 extends PApplet {
         fill(0);
         stroke(255, 180);
         noStroke();
-        
+
         rect(-10, -10, width + 20, topY + 10, 0, 0, 20, 20);
         rect(-10, bottomY, width + 20, height - bottomY + 10, 20, 20, 0, 0);
         popStyle();

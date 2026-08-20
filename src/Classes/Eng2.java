@@ -55,7 +55,6 @@ public class Eng2 extends PApplet {
         transY = b % 1f;
         logoTransparency = (float) (255 * (-Math.pow(transY, 2) + 2 * (transY)));
 
-        // Animación de 4 Beats: Mecánica de fluidos
         drawFluidMechanicsScene(currentBeat, timeSec);
 
         if (alogo != null) {
@@ -75,7 +74,6 @@ public class Eng2 extends PApplet {
         strokeCap(ROUND);
         strokeJoin(ROUND);
 
-        // --- PARÁMETROS GEOMÉTRICOS ---
         float pipeStartX = width * 0.12f;
         float pipeWidth1 = width * 0.28f;
         float transitionW = width * 0.12f;
@@ -88,9 +86,8 @@ public class Eng2 extends PApplet {
         float h1 = 160f;
         float h2 = 60f;
 
-        // --- 1. RELLENO DEL FLUIDO EN LA TUBERÍA ---
         noStroke();
-        fill(255, 15); // Líquido interior muy sutil
+        fill(255, 15);
         beginShape();
         vertex(pipeStartX, pipeY1 - h1 * 0.5f);
         vertex(pipeStartX + pipeWidth1, pipeY1 - h1 * 0.5f);
@@ -102,12 +99,10 @@ public class Eng2 extends PApplet {
         vertex(pipeStartX, pipeY1 + h1 * 0.5f);
         endShape(CLOSE);
 
-        // --- 2. CONTORNOS DE LA TUBERÍA Y SOPORTES ---
         stroke(255, 230);
         strokeWeight(3f);
         noFill();
 
-        // Perfil Superior
         beginShape();
         vertex(pipeStartX, pipeY1 - h1 * 0.5f);
         vertex(pipeStartX + pipeWidth1, pipeY1 - h1 * 0.5f);
@@ -115,7 +110,6 @@ public class Eng2 extends PApplet {
         vertex(pipeEndX, pipeY2 - h2 * 0.5f);
         endShape();
 
-        // Perfil Inferior
         beginShape();
         vertex(pipeStartX, pipeY1 + h1 * 0.5f);
         vertex(pipeStartX + pipeWidth1, pipeY1 + h1 * 0.5f);
@@ -123,11 +117,9 @@ public class Eng2 extends PApplet {
         vertex(pipeEndX, pipeY2 + h2 * 0.5f);
         endShape();
 
-        // Entradas y salidas
         ellipse(pipeStartX, pipeY1, 30f, h1);
         ellipse(pipeEndX, pipeY2, 18f, h2);
 
-        // Soportes
         float support1X = pipeStartX + 12f;
         float support2X = pipeStartX + pipeWidth1 + transitionW + pipeWidth2 - 15f;
         float supportBottomY = height * 0.82f;
@@ -137,7 +129,6 @@ public class Eng2 extends PApplet {
         line(support1X, pipeY1 + h1 * 0.5f, support1X, supportBottomY);
         line(support2X, pipeY2 + h2 * 0.5f, support2X, supportBottomY);
 
-        // --- 3. VECTORES DE VELOCIDAD INTERNOS ---
         float arrowPhase = (timeSec * 1.8f) % 1.0f;
         float[] arrowYOffsets = {-h1 * 0.28f, 0f, h1 * 0.28f};
 
@@ -155,18 +146,15 @@ public class Eng2 extends PApplet {
         float narrowX = pipeStartX + pipeWidth1 + transitionW + narrowArrowPhase * (pipeWidth2 * 0.45f);
         drawVelocityArrow(narrowX, pipeY2, 90f, 8f, 255, 200);
 
-        // --- 4. RECIPIENTE Y LÍNEA DE AGUA ONDULADA ---
         float containerX = width * 0.76f;
         float containerY = height * 0.65f;
         float containerW = 210f;
         float containerH = 190f;
 
-        // Base del agua subiendo
         float fillRatio = smoothStep(1.0f, 3.8f, currentBeat);
         float baseWaterY = (containerY + containerH * 0.5f) - (containerH * 0.60f * fillRatio);
 
         if (fillRatio > 0.05f) {
-            // Relleno interior del agua
             noStroke();
             fill(255, 30);
             beginShape();
@@ -182,7 +170,6 @@ public class Eng2 extends PApplet {
             vertex(leftX, containerY + containerH * 0.5f - 2f);
             endShape(CLOSE);
 
-            // Línea de la superficie
             stroke(255, 210);
             strokeWeight(2.5f);
             noFill();
@@ -195,14 +182,12 @@ public class Eng2 extends PApplet {
             endShape();
         }
 
-        // Estructura del Recipiente
         stroke(255, 230);
         strokeWeight(3f);
         noFill();
         rectMode(CENTER);
         rect(containerX, containerY, containerW, containerH, 2f);
 
-        // --- 5. BLOQUE FLOTANTE Y FUERZAS ---
         float blockW = 65f;
         float blockH = 95f;
 
@@ -211,30 +196,25 @@ public class Eng2 extends PApplet {
         float blockY = targetBlockY;
 
         if (fillRatio > 0.1f) {
-            // Sombra/Brillo del bloque
             noStroke();
             fill(255, 10);
             rect(containerX, blockY, blockW + 10f, blockH + 10f, 6f);
 
-            // Bloque principal
             stroke(255, 240);
             strokeWeight(2.5f);
-            fill(15, 15, 20); // Color oscuro para contraste
-            rect(containerX, blockY, blockW, blockH, 4f); // Bordes redondeados
+            fill(15, 15, 20);
+            rect(containerX, blockY, blockW, blockH, 4f);
 
-            // Vectores de fuerza
             float forceVectorLength = 75f;
             drawForceVector(containerX, blockY - blockH * 0.5f, containerX, blockY - blockH * 0.5f - forceVectorLength, 12f);
             drawForceVector(containerX, blockY + blockH * 0.5f, containerX, blockY + blockH * 0.5f + forceVectorLength, 12f);
         }
 
-        // --- 6. FLUJO Y SALPICADURAS (CHORRO DE SALIDA) ---
         if (currentBeat > 0.8f) {
             float jetStartX = pipeEndX;
             float targetX = containerX - blockW * 0.6f;
             float targetY = max(baseWaterY, containerY - containerH * 0.2f);
 
-            // Grosor del chorro con transparencia
             noFill();
             for(int i = 0; i < 3; i++) {
                 stroke(255, 70 - i * 20);
@@ -248,7 +228,6 @@ public class Eng2 extends PApplet {
                 endShape();
             }
 
-            // Partículas de salpicadura
             if (frameCount % 2 == 0) {
                 for(int i=0; i<2; i++){
                     jetParticles.add(new Particle(

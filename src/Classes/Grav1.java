@@ -1,13 +1,11 @@
 package Classes;
 
 import processing.core.PApplet;
-import processing.core.PFont;
 
 public class Grav1 extends PApplet {
 
     float t = 0;
     float w = 100f / 120f;
-    PFont ntr;
     float logoTransparency;
     float transY;
 
@@ -29,7 +27,6 @@ public class Grav1 extends PApplet {
         background(0);
 
         float b = t * w;
-        textFont(ntr);
 
         transY = b % 1f;
         logoTransparency = (float) (255 * (-Math.pow(transY, 2) + 2 * (transY)));
@@ -47,7 +44,7 @@ public class Grav1 extends PApplet {
         float halfH = boxH * 0.5f;
 
         float a1 = halfH * 0.85f;
-        float e1 = 0.95f;
+        float e1 = 0.60f;
         float c1 = a1 * e1;
         float b1_el = a1 * sqrt(1.0f - e1 * e1);
 
@@ -62,12 +59,17 @@ public class Grav1 extends PApplet {
         float p1Y = cy + b1_el * sin(E1);
         float r1 = dist(focusX, focusY, p1X, p1Y);
 
+        float M_impact = (((14.8f % 2.0f) / 2.0f) * TWO_PI) + PI;
+        float E_impact = solveKepler(M_impact, e1);
+        float impactX = cx - a1 * cos(E_impact);
+        float impactY = cy + b1_el * sin(E_impact);
+
         float escX = p1X;
         float escY = p1Y;
         if (b >= 14.8f) {
             float escProg = map(b, 14.8f, 16.0f, 0.0f, 1.0f);
-            escX = p1X + escProg * (a1 * 2.5f);
-            escY = p1Y - escProg * escProg * (a1 * 1.3f) - escProg * (a1 * 0.7f);
+            escX = impactX + escProg * (a1 * 2.5f);
+            escY = impactY - escProg * escProg * (a1 * 1.3f) - escProg * (a1 * 0.7f);
         }
 
         float zoom = 1.0f;
@@ -83,8 +85,17 @@ public class Grav1 extends PApplet {
             camY = lerp(cy, escY, easeZ);
         }
 
+        // Camera impact shudder effect
+        float shakeX = 0;
+        float shakeY = 0;
+        if (b >= 14.8f && b < 15.4f) {
+            float shakeMag = map(b, 14.8f, 15.4f, 16f, 0f) / zoom;
+            shakeX = sin(b * 130f) * shakeMag;
+            shakeY = cos(b * 160f) * shakeMag;
+        }
+
         pushMatrix();
-        translate(cx, cy);
+        translate(cx + shakeX, cy + shakeY);
         scale(zoom);
         translate(-camX, -camY);
 
@@ -93,6 +104,7 @@ public class Grav1 extends PApplet {
         strokeWeight(3.0f / zoom);
         ellipse(cx, cy, a1 * 2, b1_el * 2);
 
+        // Dynamic vector field with traveling wave distortion
         if (b >= 6.0f && b < 8.0f) {
             strokeWeight(1.2f / zoom);
             float step = 30f;
@@ -116,9 +128,10 @@ public class Grav1 extends PApplet {
 
                     float fTot = sqrt(fx * fx + fy * fy);
                     if (fTot > 0.001f) {
-                        float len = constrain(fTot * 0.85f, 4f, 22f);
+                        float wave = sin(b * 12f - sqrt(d1Sq) * 0.05f) * 2.5f;
+                        float len = constrain(fTot * 0.85f + wave, 3f, 24f);
                         float angle = atan2(fy, fx);
-                        float alpha = map(len, 4f, 22f, 35, 230);
+                        float alpha = map(len, 3f, 24f, 35, 230);
                         stroke(255, alpha);
                         line(gx, gy, gx + cos(angle) * len, gy + sin(angle) * len);
                     }
@@ -201,15 +214,6 @@ public class Grav1 extends PApplet {
             fill(255, 200);
             circle(cx, cy, 5 / zoom);
             circle(focus2X, focusY, 5 / zoom);
-
-            textSize(16 / zoom);
-            textAlign(CENTER, BOTTOM);
-            text("a", cx - a1 * 0.5f, cy - 5);
-            textAlign(RIGHT, CENTER);
-            text("b", cx - 8, cy - b1_el * 0.5f);
-            textAlign(CENTER, TOP);
-            text("F1", focusX, focusY + 14);
-            text("F2", focus2X, focusY + 14);
         }
 
         if (b >= 4.0f && b < 6.0f) {
@@ -225,20 +229,36 @@ public class Grav1 extends PApplet {
             stroke(255);
             drawArrow(p1X, p1Y, p1X + cos(angleToFocus) * fMag, p1Y + sin(angleToFocus) * fMag, sw);
             drawArrow(focusX, focusY, focusX - cos(angleToFocus) * fMag, focusY - sin(angleToFocus) * fMag, sw);
-
-            fill(255);
-            textSize(15 / zoom);
-            textAlign(LEFT, BOTTOM);
-            text("F12", p1X + 15, p1Y - 15);
-            text("F21", focusX - 35, focusY - 15);
         }
 
-        fill(255);
+        // Central star glowing corona
         noStroke();
-        circle(focusX, focusY, 26 / zoom);
-
+        float pulse = sin(t * 6f) * 4f;
+        for (int r = 4; r >= 1; r--) {
+            fill(255, 12 + r * 10);
+            circle(focusX, focusY, (100f + pulse + r * 16f) / zoom);
+        }
         fill(255);
-        circle(p1X, p1Y, 12 / zoom);
+        circle(focusX, focusY, 100f / zoom);
+
+        // Orbital comet trail for planet 1
+        if (b < 14.8f) {
+            noStroke();
+            for (int i = 10; i > 0; i--) {
+                float b_hist = b - (i * 0.025f);
+                if (b_hist < 0) b_hist += cycleTime * w;
+                float M_hist = (((b_hist % 2.0f) / 2.0f) * TWO_PI) + PI;
+                float E_hist = solveKepler(M_hist, e1);
+                float hX = cx - a1 * cos(E_hist);
+                float hY = cy + b1_el * sin(E_hist);
+                float alpha = map(i, 0, 10, 160, 0);
+                fill(255, alpha);
+                circle(hX, hY, map(i, 0, 10, 12, 3) / zoom);
+            }
+
+            fill(255);
+            circle(p1X, p1Y, 12 / zoom);
+        }
 
         if (b >= 2.0f && b < 4.0f) {
             float mu = 80000f;
@@ -248,14 +268,6 @@ public class Grav1 extends PApplet {
             float E_total = K + U;
 
             float barX = cx + 640f;
-            float barY = cy - 150f;
-
-            fill(255);
-            textSize(14);
-            textAlign(LEFT, CENTER);
-            text("Ek", barX, barY + 20);
-            text("Ep", barX + 80, barY + 20);
-            text("Et", barX + 160, barY + 20);
 
             noStroke();
             fill(255, 220);
@@ -274,10 +286,12 @@ public class Grav1 extends PApplet {
             float b2_el = a2 * sqrt(1.0f - e2 * e2);
             float c2 = a2 * e2;
 
-            stroke(255, 40);
-            strokeWeight(1.0f / zoom);
-            noFill();
-            ellipse(focusX + c2, cy, a2 * 2, b2_el * 2);
+            if (b < 14.8f) {
+                stroke(255, 40);
+                strokeWeight(1.0f / zoom);
+                noFill();
+                ellipse(focusX + c2, cy, a2 * 2, b2_el * 2);
+            }
 
             float T2 = 2.0f * pow(a2 / a1, 1.5f);
             float M2 = (((b % T2) / T2) * TWO_PI) + PI;
@@ -290,17 +304,34 @@ public class Grav1 extends PApplet {
                 circle(p2X_orb, p2Y_orb, 9 / zoom);
             } else if (b < 14.8f) {
                 float subProg = map(b, 14.0f, 14.8f, 0.0f, 1.0f);
+                subProg = subProg * subProg * (3.0f - 2.0f * subProg);
                 float p2X = lerp(p2X_orb, p1X, subProg);
                 float p2Y = lerp(p2Y_orb, p1Y, subProg);
                 fill(255, 200);
                 circle(p2X, p2Y, 9 / zoom);
             } else {
-                if (b < 15.2f) {
-                    float shockProg = map(b, 14.8f, 15.2f, 0.0f, 1.0f);
+                // Shockwaves and radiating debris sparks on collision
+                float sparkAge = b - 14.8f;
+
+                if (sparkAge < 0.6f) {
+                    float shockProg = map(sparkAge, 0.0f, 0.6f, 0.0f, 1.0f);
                     stroke(255, 255 * (1.0f - shockProg));
-                    strokeWeight(2.5f / zoom);
+                    strokeWeight(3.0f / zoom);
                     noFill();
-                    circle(p1X, p1Y, shockProg * 350f / zoom);
+                    circle(impactX, impactY, shockProg * 250f / zoom);
+                    circle(impactX, impactY, shockProg * 420f / zoom);
+
+                    // Ejecta sparks
+                    noStroke();
+                    int numSparks = 20;
+                    for (int s = 0; s < numSparks; s++) {
+                        float spAngle = (s / (float) numSparks) * TWO_PI + (s * 0.7f);
+                        float spSpeed = lerp(120f, 320f, (s % 5) / 5.0f);
+                        float spX = impactX + cos(spAngle) * spSpeed * sparkAge;
+                        float spY = impactY + sin(spAngle) * spSpeed * sparkAge;
+                        fill(255, map(sparkAge, 0f, 0.6f, 255f, 0f));
+                        circle(spX, spY, map(sparkAge, 0f, 0.6f, 5f, 1f) / zoom);
+                    }
                 }
 
                 float escProg = map(b, 14.8f, 16.0f, 0.0f, 1.0f);
@@ -309,7 +340,7 @@ public class Grav1 extends PApplet {
                 noFill();
                 beginShape();
                 for (float hp = 0; hp <= escProg; hp += 0.03f) {
-                    vertex(p1X + hp * (a1 * 2.5f), p1Y - hp * hp * (a1 * 1.3f) - hp * (a1 * 0.7f));
+                    vertex(impactX + hp * (a1 * 2.5f), impactY - hp * hp * (a1 * 1.3f) - hp * (a1 * 0.7f));
                 }
                 endShape();
 
@@ -320,10 +351,6 @@ public class Grav1 extends PApplet {
         }
 
         popMatrix();
-
-        fill(255);
-        textSize(18);
-        textAlign(LEFT, TOP);
 
         popStyle();
     }
@@ -362,8 +389,6 @@ public class Grav1 extends PApplet {
     }
 
     public void setup() {
-        ntr = createFont("times.ttf", 50);
-
         float finalX = (width / 2f) + 865.3f;
         float finalY = (height / 2f) - 458.1f;
         float finalW = (height / 2f) - 381.75f;

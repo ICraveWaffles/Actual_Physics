@@ -37,18 +37,23 @@ public class Cir1 extends PApplet {
         float cy = height * 0.5f;
 
         pushMatrix();
+        pushStyle(); // Aísla el estilo de la escena para no afectar al logo
         drawScene(b, cx, cy);
+        popStyle();
         popMatrix();
 
         if (clogo != null) {
+            pushMatrix();
+            pushStyle(); // Protege al logo de trazos y estilos heredados de la escena
             clogo.display(this, b, logoTransparency);
+            popStyle();
+            popMatrix();
         }
 
         popStyle();
     }
 
     private void drawScene(float b, float cx, float cy) {
-
 
         float acCurrent = sin(PI * b);
         float dcCurrent = abs(acCurrent);
@@ -75,7 +80,6 @@ public class Cir1 extends PApplet {
         drawDiodeSegment(leftX, cy, xBridge, botY, posCycle, dcCurrent, b);
         drawDiodeSegment(xBridge, botY, rightX, cy, !posCycle, dcCurrent, b);
         drawDiodeSegment(leftX, cy, xBridge, topY, !posCycle, dcCurrent, b);
-
 
         drawWireWithCurrent(rightX, cy, rightX, cy - 220f, dcCurrent, b);
         drawWireWithCurrent(rightX, cy - 220f, xLoad, cy - 220f, dcCurrent, b);
@@ -118,7 +122,8 @@ public class Cir1 extends PApplet {
                 float px = lerp(x1, x2, tFactor);
                 float py = lerp(y1, y2, tFactor);
 
-                fill(200, 200, 0, 130 * absCurr);
+                // Cambiado de amarillo a blanco/transparente
+                fill(255, 130 * absCurr);
                 circle(px, py, 14 * absCurr + 2);
 
                 fill(255, 240 * absCurr);
@@ -170,9 +175,10 @@ public class Cir1 extends PApplet {
         translate(mx, my);
         rotate(angle);
 
+        // Cambiado de cian a escala de grises
         if (active) {
-            fill(0, 220, 255);
-            stroke(0, 255, 255);
+            fill(255);
+            stroke(255);
         } else {
             fill(30);
             stroke(100);
@@ -195,8 +201,9 @@ public class Cir1 extends PApplet {
         pushMatrix();
         translate(x, cy);
 
+        // Cambiado el resplandor cian a blanco
         if (current > 0.05f) {
-            stroke(0, 220, 255, 140 * current);
+            stroke(255, 140 * current);
             strokeWeight(16);
             noFill();
             drawZigZag();
@@ -227,8 +234,6 @@ public class Cir1 extends PApplet {
         noStroke();
         circle(x, y, 12);
     }
-
-
 
     public void settings() {
         fullScreen();

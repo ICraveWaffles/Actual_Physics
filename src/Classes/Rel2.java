@@ -85,7 +85,6 @@ public class Rel2 extends PApplet {
         float animX = cx - usableW * 0.5f;
         float animY = marginTop;
 
-        // Clip más amplio para no cortar flechas ni etiquetas
         clip(animX - 60, animY - 60, usableW + 120, usableH + 120);
 
         float originX = animX + usableW * 0.15f;
@@ -105,7 +104,6 @@ public class Rel2 extends PApplet {
         float xPrimeDx = cos(alpha);
         float xPrimeDy = -sin(alpha);
 
-        // Malla espacio-temporal
         stroke(255, 30 + sin(frameCount * 0.05f) * 10);
         strokeWeight(1f);
 
@@ -121,7 +119,6 @@ public class Rel2 extends PApplet {
             drawDashedLine(startX2, startY2, startX2 + xPrimeDx * axisLen, startY2 + xPrimeDy * axisLen, 4f);
         }
 
-        // Cono de luz (línea fotón)
         float lightLen = (float) (axisLen * Math.sqrt(2));
         float lightX = originX + cos(-QUARTER_PI) * lightLen;
         float lightY = originY + sin(-QUARTER_PI) * lightLen;
@@ -130,19 +127,16 @@ public class Rel2 extends PApplet {
         strokeWeight(2f);
         drawDashedLine(originX, originY, lightX, lightY, 4f);
 
-        // Ejes principales (ct, x)
         stroke(255, 240);
         strokeWeight(2.5f);
         drawArrow(originX, originY, originX, originY - axisLen * 1.05f);
         drawArrow(originX, originY, originX + axisLen * 1.05f, originY);
 
-        // Ejes primos (ct', x')
         stroke(255, 180);
         strokeWeight(2f);
         drawArrow(originX, originY, originX + ctPrimeDx * axisLen * 1.05f, originY + ctPrimeDy * axisLen * 1.05f);
         drawArrow(originX, originY, originX + xPrimeDx * axisLen * 1.05f, originY + xPrimeDy * axisLen * 1.05f);
 
-        // Arcos de ángulo alpha
         noFill();
         stroke(255, 140);
         strokeWeight(1.2f);
@@ -151,7 +145,6 @@ public class Rel2 extends PApplet {
 
 
 
-        // Eventos en los ejes
         int numEvents = 4;
         for (int i = 1; i <= numEvents; i++) {
             float eventT = i / (float) numEvents;
@@ -174,7 +167,6 @@ public class Rel2 extends PApplet {
             }
         }
 
-        // Puntos móviles de progreso
         float curEv1Y = originY - axisLen * progress;
         float curEv2X = originX + ctPrimeDx * axisLen * progress;
         float curEv2Y = originY + ctPrimeDy * axisLen * progress;
@@ -194,7 +186,6 @@ public class Rel2 extends PApplet {
             }
         }
 
-        // --- SECCIÓN DE RELOJES Y LÍNEA HORIZONTAL ---
         noClip();
 
         float clockY = originY + 52f;
@@ -209,7 +200,6 @@ public class Rel2 extends PApplet {
         float clock2EndX = originX + axisLen * 1.35f;
         float clock2X = lerp(clock2StartX, clock2EndX, progress);
 
-        // Línea horizontal del sistema de relojes
         stroke(255, 90);
         strokeWeight(1.5f);
         line(clockLineX1, clockY, clockLineX2, clockY);
@@ -283,7 +273,6 @@ public class Rel2 extends PApplet {
 
         popMatrix();
 
-        // Texto descriptivo del reloj
         fill(255, 180);
         textSize(11);
         textAlign(CENTER, TOP);

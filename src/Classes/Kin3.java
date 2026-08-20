@@ -119,7 +119,7 @@ public class Kin3 extends PApplet {
         drawDashedLine(fPx - fnetX * forceScale, fPy, fPx - fnetX * forceScale, fPy - fnetY * forceScale, 6, 6);
         drawDashedLine(fPx, fPy - fnetY * forceScale, fPx - fnetX * forceScale, fPy - fnetY * forceScale, 6, 6);
 
-        fill(150, 200, 255);
+        fill(255);
         noStroke();
         rectMode(CENTER);
         pushMatrix();
@@ -183,7 +183,7 @@ public class Kin3 extends PApplet {
     }
 
     void drawProgressiveFrictionPath(float x0, float x1, float y0, float yPeak, float currentAnimT) {
-        stroke(100, 160, 255, 180);
+        stroke(255, 180);
         strokeWeight(2);
         noFill();
 

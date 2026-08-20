@@ -23,7 +23,7 @@ public class EB extends PApplet {
             t = 0;
         }
 
-        background(15);
+        background(0);
 
         float b = t * w;
 

@@ -283,13 +283,13 @@ public class EG extends PApplet {
         stroke(255, alphaText * 0.8f);
         strokeWeight(1.0f);
 
-        drawCallout(contX - 40f, contY - 290f, contX - 170f, contY - 340f, "BLINDAJE DE CONTENCIÓN", true);
-        drawCallout(rpvX - 10f, rpvY - 70f, rpvX - 170f, rpvY - 120f, "BARRAS DE CONTROL", true);
-        drawCallout(rpvX + 5f, rpvY, rpvX - 170f, rpvY + 70f, "MODERADOR", true);
-        drawCallout(sgX, sgY - 50f, sgX + 70f, sgY - 140f, "INTERCAMBIADOR DE CALOR", false);
-        drawCallout(turbX + 15f, shaftY - 25f, turbX + 15f, shaftY - 120f, "TURBINA DE VAPOR", false);
-        drawCallout(turbX + 140f, shaftY, turbX + 180f, shaftY - 80f, "GENERADOR ELÉCTRICO", false);
-        drawCallout(condX, condY + 10f, condX - 20f, condY + 100f, "CONDENSADOR", true);
+        drawCallout(contX - 40f, contY - 290f, contX - 170f, contY - 340f, "CONTAINMENT SHIELD", true);
+        drawCallout(rpvX - 10f, rpvY - 70f, rpvX - 170f, rpvY - 120f, "CONTROL RODS", true);
+        drawCallout(rpvX + 5f, rpvY, rpvX - 170f, rpvY + 70f, "MODERATOR", true);
+        drawCallout(sgX, sgY - 50f, sgX + 70f, sgY - 140f, "HEAT EXCHANGER", false);
+        drawCallout(turbX + 15f, shaftY - 25f, turbX + 15f, shaftY - 120f, "STEAM TURBINE", false);
+        drawCallout(turbX + 140f, shaftY, turbX + 180f, shaftY - 80f, "ELECTRIC GENERATOR", false);
+        drawCallout(condX, condY + 10f, condX - 20f, condY + 100f, "CONDENSER", true);
     }
 
     private void drawCallout(float targetX, float targetY, float textX, float textY, String label, boolean alignRight) {

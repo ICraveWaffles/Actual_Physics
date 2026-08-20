@@ -67,10 +67,6 @@ public class Eng1 extends PApplet {
         float b = timeSec * (100f / 60f);
         transY = b % 1f;
         logoTransparency = (float) (255 * (-Math.pow(transY, 2) + 2 * (transY)));
-
-        // Etapa 1 (Beats 0-4): Ciclos P-V y Pistones
-        // Etapa 2 (Beats 4-6): Máquina Térmica en el CENTRO
-        // Etapa 3 (Beats 6-8): Máquina Térmica a la DERECHA + Entropía a la IZQUIERDA
         if (currentBeat < 4f) {
             drawThermodynamicCycles(currentBeat / 4f, timeSec);
             lastQuarterStep = -1;
@@ -79,7 +75,6 @@ public class Eng1 extends PApplet {
             drawHeatEngine(width * 0.50f, height * 0.5f, heatEngineProgress, timeSec);
             lastQuarterStep = -1;
         } else {
-            // Desplazamiento fluido del centro a la derecha
             float moveProgress = smoothStep(6.0f, 6.8f, currentBeat);
             float engineX = lerp(width * 0.50f, width * 0.70f, moveProgress);
 
@@ -320,7 +315,6 @@ public class Eng1 extends PApplet {
         float coldY = cy + 220f;
         float engineR = 80f;
 
-        // Focos Térmicos
         stroke(255, 220);
         strokeWeight(2.5f);
         noFill();
@@ -328,10 +322,8 @@ public class Eng1 extends PApplet {
         rect(cx, hotY, resW, resH);
         rect(cx, coldY, resW, resH);
 
-        // Motor Central
         ellipse(cx, cy, engineR * 2f, engineR * 2f);
 
-        // Flujos
         drawAnimatedArrow(cx, hotY + resH * 0.5f, cx, cy - engineR, timeSec, 8);
         drawAnimatedArrow(cx, cy + engineR, cx, coldY - resH * 0.5f, timeSec, 8);
         drawAnimatedArrow(cx + engineR, cy, cx + engineR + 150f, cy, timeSec, 6);
@@ -355,24 +347,20 @@ public class Eng1 extends PApplet {
         stroke(255, 90);
         strokeWeight(2f);
 
-        // Niveles cuánticos/energéticos
         for (int i = 0; i < 5; i++) {
             float ly = startY - i * levelSpacing;
             line(cx - levelW * 0.5f, ly, cx + levelW * 0.5f, ly);
         }
 
-        // Cálculo del paso cada cuarto de beat (0.25 beats = 8 pasos totales de beat 6 a 8)
         int currentQuarterStep = floor((currentBeat - 6.0f) / 0.25f);
         currentQuarterStep = constrain(currentQuarterStep, 0, 7);
 
-        // Actualización de estado en cada cuarto de beat
         if (currentQuarterStep != lastQuarterStep) {
             lastQuarterStep = currentQuarterStep;
-            float stepEntropyRatio = currentQuarterStep / 7.0f; // Incremento de entropía (0.0 a 1.0)
+            float stepEntropyRatio = currentQuarterStep / 7.0f;
             int maxLevelAccessible = floor(stepEntropyRatio * 4.99f);
 
             for (int i = 0; i < 12; i++) {
-                // Distribución con mayor dispersión de niveles conforme sube el cuarto de beat
                 if (random(1f) < (0.3f + 0.7f * stepEntropyRatio)) {
                     entropyParticleTargetLevels[i] = floor(random(0, maxLevelAccessible + 1));
                 } else {
@@ -382,12 +370,10 @@ public class Eng1 extends PApplet {
             }
         }
 
-        // Animación suave entre estados de entropía
         float entropyLevelFactor = currentQuarterStep / 7.0f;
         for (int i = 0; i < 12; i++) {
             entropyParticleLevels[i] = lerp(entropyParticleLevels[i], entropyParticleTargetLevels[i], 0.12f);
 
-            // Agitación térmica proporcional al nivel de entropía actual
             float thermalSpeed = 1.0f + entropyLevelFactor * 4.0f;
             float wave = sin(timeSec * thermalSpeed + i * 1.2f) * (8f + entropyLevelFactor * 25f);
             float px = cx + entropyParticleJitter[i] + wave;

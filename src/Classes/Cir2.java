@@ -2,6 +2,7 @@ package Classes;
 
 import processing.core.PApplet;
 import processing.core.PFont;
+import processing.core.PVector;
 
 public class Cir2 extends PApplet {
 
@@ -36,20 +37,23 @@ public class Cir2 extends PApplet {
         float cy = height * 0.5f;
 
         pushMatrix();
+        pushStyle(); // Protege el estilo global
         drawScene(b, cx, cy);
+        popStyle();
         popMatrix();
 
         if (clogo != null) {
+            pushMatrix();
+            pushStyle(); // Protege el logo del grosor de trazo de la escena
             clogo.display(this, b, logoTransparency);
+            popStyle();
+            popMatrix();
         }
 
         popStyle();
     }
 
     private void drawScene(float b, float cx, float cy) {
-        float topCutY = height * 0.14f;
-        float bottomCutY = height * 0.86f;
-
         float x1 = width * 0.22f;
         float x2 = width * 0.50f;
         float x3 = width * 0.78f;
@@ -62,7 +66,7 @@ public class Cir2 extends PApplet {
 
         float i1 = 1.0f;
         float i3 = 0.6f;
-        float i2 = 0.4f;
+        float i2 = 0.75f; // Mayor visibilidad de corriente en la segunda malla
 
         drawWireWithCurrent(x1, cy - 35f, x1, topY, i1, b);
         drawWireWithCurrent(x1, botY, x1, cy + 35f, i1, b);
@@ -88,8 +92,9 @@ public class Cir2 extends PApplet {
 
         drawWireWithCurrent(x2, botY, x1, botY, i1, b);
 
-        drawNode(x2, topY, b >= 2.0f);
-        drawNode(x2, botY, false);
+        boolean isNodePhase = (b >= 2.0f);
+        drawNode(x2, topY, isNodePhase);
+        drawNode(x2, botY, isNodePhase); // Ambos nodos resaltados
         drawNode(x1, topY, false);
         drawNode(x1, botY, false);
         drawNode(x3, topY, false);
@@ -98,9 +103,9 @@ public class Cir2 extends PApplet {
         if (b < 2.0f) {
             drawMeshLoops(midX12, midX23, cy, b);
         } else {
-            drawNodeLaw(x2, topY, b);
+            drawNodeLawTop(x2, topY, b);
+            drawNodeLawBottom(x2, botY, b);
         }
-
     }
 
     private void drawBattery(float x, float y) {
@@ -166,63 +171,136 @@ public class Cir2 extends PApplet {
                 float px = lerp(x1, x2, tFactor);
                 float py = lerp(y1, y2, tFactor);
 
-                fill(200, 200, 0, 130 * absCurr);
+                fill(255, 130 * absCurr);
                 circle(px, py, 12 * absCurr + 2);
 
-                fill(200, 200, 0, 240 * absCurr);
+                fill(255, 240 * absCurr);
                 circle(px, py, 4 * absCurr + 1);
             }
         }
     }
 
     private void drawMeshLoops(float m1Cx, float m2Cx, float cy, float b) {
-        float r = 60f;
+        float loopW = 140f;
+        float loopH = 140f;
 
-        drawLoopSpinner(m1Cx, cy, r*2, b);
-        drawLoopSpinner(m2Cx, cy, r*2, b);
+        // Malla izquierda y derecha con recorrido cuadrado en sentido positivo (horario)
+        drawSquareLoop(m1Cx, cy, loopW, loopH, b, true);
+        drawSquareLoop(m2Cx, cy, loopW, loopH, b, true);
     }
 
-    private void drawLoopSpinner(float cx, float cy, float r, float b) {
+    private void drawSquareLoop(float cx, float cy, float w, float h, float b, boolean clockwise) {
         pushMatrix();
         translate(cx, cy);
 
+        rectMode(CENTER);
         stroke(255, 40);
         strokeWeight(2.5f);
         noFill();
-        circle(0, 0, r * 2);
+        rect(0, 0, w, h, 12);
 
-        float startAngle = (b * TWO_PI * 0.5f) % TWO_PI;
-        float arcLen = PI * 1.3f;
+        float totalL = 2 * (w + h);
+        float activeL = totalL * 0.7f;
+        float speed = b * totalL * 0.35f;
+
+        float headD = speed;
+
+        int numSamples = 40;
         stroke(255, 230);
         strokeWeight(4f);
         strokeCap(ROUND);
-        arc(0, 0, r * 2, r * 2, startAngle, startAngle + arcLen);
+        strokeJoin(ROUND);
+        noFill();
 
-        float headAngle = startAngle + arcLen;
-        float ax = r * cos(headAngle);
-        float ay = r * sin(headAngle);
+        beginShape();
+        for (int i = 0; i <= numSamples; i++) {
+            float progress = (float) i / numSamples;
+            float d = headD - activeL + progress * activeL;
+
+            PVector pt = getPointOnRect(d, w, h, clockwise);
+            vertex(pt.x, pt.y);
+        }
+        endShape();
+
+        PVector headPt = getPointOnRect(headD, w, h, clockwise);
+        float angle = getAngleOnRect(headD, w, h, clockwise);
 
         pushMatrix();
-        translate(ax, ay);
-        rotate(headAngle + HALF_PI);
+        translate(headPt.x, headPt.y);
+        rotate(angle);
         fill(255);
         noStroke();
-        triangle(0, 0, -5, -9, 5, -9);
+        triangle(0, 0, -10, -6, -10, 6);
         popMatrix();
 
         popMatrix();
     }
 
-    private void drawNodeLaw(float nx, float ny, float b) {
-        float pulse = map(sin(b * PI*4), -1, 1, 12, 28);
+    private PVector getPointOnRect(float d, float w, float h, boolean clockwise) {
+        float hw = w / 2f;
+        float hh = h / 2f;
+        float totalL = 2 * (w + h);
+
+        d = (d % totalL + totalL) % totalL;
+        if (!clockwise) {
+            d = (totalL - d) % totalL;
+        }
+
+        if (d < w) {
+            return new PVector(-hw + d, -hh);
+        } else if (d < w + h) {
+            return new PVector(hw, -hh + (d - w));
+        } else if (d < 2 * w + h) {
+            return new PVector(hw - (d - (w + h)), hh);
+        } else {
+            return new PVector(-hw, hh - (d - (2 * w + h)));
+        }
+    }
+
+    private float getAngleOnRect(float d, float w, float h, boolean clockwise) {
+        float totalL = 2 * (w + h);
+
+        d = (d % totalL + totalL) % totalL;
+        if (!clockwise) {
+            d = (totalL - d) % totalL;
+        }
+
+        float baseAngle;
+        if (d < w) {
+            baseAngle = 0; // Hacia la derecha
+        } else if (d < w + h) {
+            baseAngle = HALF_PI; // Hacia abajo
+        } else if (d < 2 * w + h) {
+            baseAngle = PI; // Hacia la izquierda
+        } else {
+            baseAngle = 3 * HALF_PI; // Hacia arriba
+        }
+
+        return clockwise ? baseAngle : baseAngle + PI;
+    }
+
+    private void drawNodeLawTop(float nx, float ny, float b) {
+        float pulse = map(sin(b * PI * 4), -1, 1, 12, 28);
 
         fill(255, 60);
         noStroke();
         circle(nx, ny, pulse * 2f);
 
         drawVectorArrow(nx - 75f, ny, nx - 18f, ny);
-            drawVectorArrow(nx + 18f, ny, nx + 75f, ny);
+        drawVectorArrow(nx + 18f, ny, nx + 75f, ny);
         drawVectorArrow(nx, ny + 18f, nx, ny + 75f);
+    }
+
+    private void drawNodeLawBottom(float nx, float ny, float b) {
+        float pulse = map(sin(b * PI * 4), -1, 1, 12, 28);
+
+        fill(255, 60);
+        noStroke();
+        circle(nx, ny, pulse * 2f);
+
+        drawVectorArrow(nx + 75f, ny, nx + 18f, ny);
+        drawVectorArrow(nx, ny + 75f, nx, ny + 18f);
+        drawVectorArrow(nx - 18f, ny, nx - 75f, ny);
     }
 
     private void drawVectorArrow(float x1, float y1, float x2, float y2) {
@@ -236,7 +314,8 @@ public class Cir2 extends PApplet {
         rotate(angle);
         fill(255);
         noStroke();
-        triangle(0, 0, -8, -5, -8, 5);
+        rectMode(CENTER);
+        rect(-4, 0, 9, 9);
         popMatrix();
     }
 
@@ -252,8 +331,6 @@ public class Cir2 extends PApplet {
             circle(x, y, 10);
         }
     }
-
-
 
     public void settings() {
         fullScreen();

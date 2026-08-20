@@ -1187,11 +1187,7 @@ public class XB extends PApplet {
         strokeWeight(1.5f);
         circle(currentX, cursorY, 8);
 
-        fill(0, alpha);
-        textFont(fontMain);
-        textSize(13);
-        textAlign(LEFT, TOP);
-        text("EMF (e.m.f.)", gx + 8, gy + 8);
+
 
         noClip();
         popMatrix();

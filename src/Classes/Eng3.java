@@ -63,23 +63,19 @@ public class Eng3 extends PApplet {
         strokeCap(ROUND);
         strokeJoin(ROUND);
 
-        // Geometría con reglas significativamente más largas
         float deskEndX = width * 0.12f;
-        float rulerTipX = width * 0.58f; // Extensión mayor de las reglas
+        float rulerTipX = width * 0.58f;
         float traceEndX = width * 0.95f;
 
-        float y1 = height * 0.30f; // Regla 1 (High Q)
-        float y2 = height * 0.70f; // Regla 2 (Low Q)
+        float y1 = height * 0.30f;
+        float y2 = height * 0.70f;
         float maxAmp = 135f;
 
-        // Frecuencia ligeramente menor para simular mayor inercia por la longitud
         float omega = 32f;
 
-        // Coeficientes de amortiguamiento (gamma)
-        float gammaHighQ = 0.30f; // Decaimiento muy lento
-        float gammaLowQ = 3.60f;  // Decaimiento rápido
+        float gammaHighQ = 0.30f;
+        float gammaLowQ = 3.60f;
 
-        // 1. DIBUJAR LA MESA/ESCRITORIO
         noStroke();
         fill(25, 28, 35);
         rectMode(CORNERS);
@@ -88,13 +84,11 @@ public class Eng3 extends PApplet {
         strokeWeight(3f);
         line(deskEndX, height * 0.05f + 15f, deskEndX, height * 0.95f - 15f);
 
-        // 2. DIBUJAR Y EVALUAR REGLA 1 (ALTO Q-FACTOR)
         float currentAmp1 = getAmplitude(tCycle, maxAmp, gammaHighQ, omega);
         drawTraceAndEnvelope(rulerTipX, traceEndX, y1, tCycle, maxAmp, gammaHighQ, omega);
         drawRuler(deskEndX, rulerTipX, y1, currentAmp1, tCycle, maxAmp, gammaHighQ, omega);
         drawClamp(deskEndX, y1);
 
-        // 3. DIBUJAR Y EVALUAR REGLA 2 (BAJO Q-FACTOR)
         float currentAmp2 = getAmplitude(tCycle, maxAmp, gammaLowQ, omega);
         drawTraceAndEnvelope(rulerTipX, traceEndX, y2, tCycle, maxAmp, gammaLowQ, omega);
         drawRuler(deskEndX, rulerTipX, y2, currentAmp2, tCycle, maxAmp, gammaLowQ, omega);
@@ -106,10 +100,8 @@ public class Eng3 extends PApplet {
     private void drawRuler(float startX, float endX, float baseY, float amp, float tCycle, float maxAmp, float gamma, float omega) {
         float L = endX - startX;
 
-        // Estructura interna / Marcas graduadas a lo largo de la regla
         float numTicks = 35f;
 
-        // Motion blur en la oscilación
         for (int i = 3; i >= 0; i--) {
             float tBlur = wrapTime(tCycle - (i * 0.008f));
             float blurAmp = getAmplitude(tBlur, maxAmp, gamma, omega);
@@ -127,7 +119,6 @@ public class Eng3 extends PApplet {
             }
             endShape();
 
-            // Dibujo de las marcas físicas de la regla en el frame principal
             if (i == 0) {
                 stroke(255, 120);
                 strokeWeight(1.8f);
@@ -139,7 +130,6 @@ public class Eng3 extends PApplet {
                     line(px, py - tickSize * 0.5f, px, py + tickSize * 0.5f);
                 }
 
-                // Brillo concentrado en la punta trazadora
                 float tipY = baseY + blurAmp;
                 pushStyle();
                 noStroke();
@@ -169,7 +159,6 @@ public class Eng3 extends PApplet {
     private void drawTraceAndEnvelope(float startX, float endX, float baseY, float tCycle, float maxAmp, float gamma, float omega) {
         float scrollSpeed = 380f;
 
-        // Lines de envolvente exponencial (Límite del Q-Factor)
         stroke(255, 55);
         strokeWeight(1.8f);
 
@@ -190,7 +179,6 @@ public class Eng3 extends PApplet {
             endShape();
         }
 
-        // Traza de la oscilación en el espacio
         noFill();
         stroke(255, 230);
         strokeWeight(2.5f);
@@ -206,7 +194,6 @@ public class Eng3 extends PApplet {
         }
         endShape();
 
-        // Eje de equilibrio horizontal
         stroke(255, 25);
         strokeWeight(1.5f);
         line(startX, baseY, endX, baseY);

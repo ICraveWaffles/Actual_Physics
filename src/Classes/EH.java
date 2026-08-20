@@ -1,7 +1,6 @@
 package Classes;
 
 import processing.core.PApplet;
-import processing.core.PFont;
 
 public class EH extends PApplet {
 
@@ -11,7 +10,6 @@ public class EH extends PApplet {
     float transY;
 
     public static Elogo elogo;
-    PFont tnrFont;
 
     float cycleTime = 4.8f;
 
@@ -127,13 +125,6 @@ public class EH extends PApplet {
             float pY = baselineY - exp(-sq((pX - packetX) / sigma)) * 90f * getHash(i, 2);
             circle(pX, pY, 5f);
         }
-
-        if (tnrFont != null) textFont(tnrFont);
-        textSize(13f);
-
-        drawCallout(barrierX + barrierW / 2f, barrierY + 20f, barrierX + barrierW / 2f + 140f, barrierY + 40f, "BARRERA DE POTENCIAL V(x)", false);
-        drawCallout(cx - 280f, baselineY - 120f, cx - 280f, baselineY - 170f, "ONDA INCIDENTE / REFLEJADA", true);
-        drawCallout(cx + 260f, baselineY - 60f, cx + 260f, baselineY - 120f, "ONDA TRANSMITIDA (EFECTO TÚNEL)", false);
     }
 
     private void drawHadrons(float cx, float cy) {
@@ -150,21 +141,20 @@ public class EH extends PApplet {
 
         pushMatrix();
 
-        drawHadron(x1, y1, "Protón", new String[]{"u", "u", "d"});
-        drawHadron(x2, y1, "Neutrón", new String[]{"u", "d", "d"});
-        drawHadron(x3, y1, "Pión (π⁺)", new String[]{"u", "d_bar"});
-        drawHadron(x4, y1, "Pión (π⁰)", new String[]{"u", "u_bar"});
+        drawHadron(x1, y1, new String[]{"u", "u", "d"});
+        drawHadron(x2, y1, new String[]{"u", "d", "d"});
+        drawHadron(x3, y1, new String[]{"u", "d_bar"});
+        drawHadron(x4, y1, new String[]{"u", "u_bar"});
 
-        drawHadron(x1, y2, "Antiprotón", new String[]{"u_bar", "u_bar", "d_bar"});
-        drawHadron(x2, y2, "Lambda (Λ⁰)", new String[]{"u", "d", "s"});
-        drawHadron(x3, y2, "Kaón (K⁰)", new String[]{"d", "s_bar"});
-        drawHadron(x4, y2, "Mesón J/Ψ", new String[]{"c", "c_bar"});
+        drawHadron(x1, y2, new String[]{"u_bar", "u_bar", "d_bar"});
+        drawHadron(x2, y2, new String[]{"u", "d", "s"});
+        drawHadron(x3, y2, new String[]{"d", "s_bar"});
+        drawHadron(x4, y2, new String[]{"c", "c_bar"});
 
         popMatrix();
     }
 
-    private void drawHadron(float x, float y, String name, String[] quarks) {
-        // Movimiento de temblor reducido en frecuencia (de 80-120 a 8-12) y amplitud (de 3.5 a 1.2)
+    private void drawHadron(float x, float y, String[] quarks) {
         float jitterX = sin(t * 8f) * 1.2f + cos(t * 12f) * 0.8f;
         float jitterY = cos(t * 9f) * 1.2f + sin(t * 11f) * 0.8f;
         float sizeFluct = sin(t * 10f) * 2.5f;
@@ -189,7 +179,6 @@ public class EH extends PApplet {
         for (int i = 0; i < numQuarks; i++) {
             float angle = i * TWO_PI / numQuarks - HALF_PI;
 
-            // Movimiento interno de los quarks atenuado y más pausado
             float moveSpeed = t * 6f;
             float wobbleX = cos(moveSpeed + i * 2.3f) * 8f + sin(moveSpeed * 0.8f + i) * 3f;
             float wobbleY = sin(moveSpeed * 1.2f + i * 1.7f) * 8f + cos(moveSpeed * 0.9f) * 3f;
@@ -199,12 +188,6 @@ public class EH extends PApplet {
 
             drawQuark(qx, qy, quarks[i]);
         }
-
-        if (tnrFont != null) textFont(tnrFont);
-        textSize(15f);
-        textAlign(CENTER, TOP);
-        fill(255);
-        text(name, 0, hadronDiameter / 2f + 12f);
 
         popMatrix();
     }
@@ -275,28 +258,6 @@ public class EH extends PApplet {
         }
     }
 
-    private void drawCallout(float targetX, float targetY, float textX, float textY, String label, boolean alignRight) {
-        fill(255);
-        noStroke();
-        circle(targetX, targetY, 5f);
-
-        stroke(255);
-        strokeWeight(1.2f);
-        line(targetX, targetY, textX, textY);
-
-        float lineEnd = alignRight ? textX - 20f : textX + 20f;
-        line(textX, textY, lineEnd, textY);
-
-        fill(255);
-        if (alignRight) {
-            textAlign(RIGHT, CENTER);
-            text(label, textX - 25f, textY - 2f);
-        } else {
-            textAlign(LEFT, CENTER);
-            text(label, textX + 25f, textY - 2f);
-        }
-    }
-
     private float getHash(int i, int j) {
         int n = i * 137 + j * 149;
         n = (n ^ (n >> 16)) * 0x45d9f3b;
@@ -310,7 +271,6 @@ public class EH extends PApplet {
     }
 
     public void setup() {
-        tnrFont = createFont("Times New Roman", 14);
         float finalX = (width / 2f) + 865.3f;
         float finalY = (height / 2f) - 458.1f;
         float finalW = (height / 2f) - 381.75f;

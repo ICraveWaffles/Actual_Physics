@@ -37,12 +37,15 @@ public class Mag3 extends PApplet {
         float cy = height * 0.5f;
 
         pushMatrix();
+        pushStyle();
         drawScene(b, cx, cy);
+        popStyle();
         popMatrix();
 
-
         if (clogo != null) {
+            pushStyle();
             clogo.display(this, b, logoTransparency);
+            popStyle();
         }
 
         popStyle();
@@ -80,7 +83,7 @@ public class Mag3 extends PApplet {
             drawComparator(cx, cy, rl_base, rr_base);
         } else {
             float fluxAlpha = 255f * e;
-            drawFluxArrows(cx, cy, b, fluxAlpha);
+            drawFluxArrows(cx, cy, ly, ry_pos, b, fluxAlpha);
         }
 
         drawLoopHalf(lx, ly, rl_x, rl_y, b, -1f, true);
@@ -172,7 +175,7 @@ public class Mag3 extends PApplet {
         line(cx - w, cy + blY, cx + w, cy + brY);
     }
 
-    private void drawFluxArrows(float cx, float cy, float b, float alpha) {
+    private void drawFluxArrows(float cx, float cy, float topWireY, float botWireY, float b, float alpha) {
         if (alpha < 2f) return;
         stroke(255, 140 * (alpha / 255f));
         strokeWeight(3.5f);
@@ -183,11 +186,9 @@ public class Mag3 extends PApplet {
 
         for (int i = -2; i <= 2; i++) {
             float x = cx + i * spacing;
-            float h = 240f - abs(i) * 50f;
-            float topY = cy - h;
-            float botY = cy + h;
+            float topY = topWireY;
+            float botY = botWireY;
 
-            line(x, botY, x, topY);
 
             for (float headY = botY - offset; headY > topY; headY -= 70f) {
                 if (headY > botY || headY < topY) continue;

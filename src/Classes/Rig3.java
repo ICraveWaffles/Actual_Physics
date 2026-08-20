@@ -4,7 +4,7 @@ import processing.core.PApplet;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class Rig4 extends PApplet {
+public class Rig3 extends PApplet {
 
     float t = 0;
     float w = 5/6f;
@@ -15,8 +15,7 @@ public class Rig4 extends PApplet {
 
     float maxBeats = 4f;
     float theta = 0;
-    float omega0 = (PI / 3f) * 2.0f;
-    float theta0;
+    float omega = 0;
 
     public void draw() {
         pushStyle();
@@ -26,12 +25,8 @@ public class Rig4 extends PApplet {
         float b = t * w;
 
         if (frameCount == 1 || b == 0) {
-            float dbCalc = (1f / 30f) * w;
-            float alphaCalc = omega0 / 2.5f;
-            float pushFrames = 2.5f / w * 30f;
-            float coastFrames = 1.5f / w * 30f;
-            theta0 = (pushFrames * (pushFrames + 1f) / 2f) * alphaCalc * dbCalc * dbCalc + coastFrames * omega0 * dbCalc;
-            theta = theta0;
+            theta = 0;
+            omega = 0;
         }
 
         if (b >= maxBeats) {
@@ -46,29 +41,25 @@ public class Rig4 extends PApplet {
         logoTransparency = (float) (255 * (-Math.pow(transY, 2) + 2 * (transY)));
         alogo.display(this, b, logoTransparency);
 
-        float L, H, D;
-        if (b < 2.0f) {
-            float p = b / 2.0f;
-            p = constrain(p, 0f, 1f);
-            p = p * p * (3f - 2f * p);
-            L = lerp(800, 180, p);
-            H = lerp(60, 260, p);
-            D = lerp(60, 260, p);
-        } else {
-            float p = (b - 2.0f) / 2.0f;
-            p = constrain(p, 0f, 1f);
-            p = p * p * (3f - 2f * p);
-            L = lerp(180, 800, p);
-            H = lerp(260, 60, p);
-            D = lerp(260, 60, p);
+        float L = 800f;
+        float H = 60f;
+        float D = 60f;
+
+        float I = (L * L) + (D * D);
+        float omegaTarget = (PI / 3f) * 2.0f;
+        float pushDurationBeats = 2.5f;
+
+        float torqueMag = 0f;
+
+        if (b < pushDurationBeats) {
+            torqueMag = (I * omegaTarget) / pushDurationBeats;
         }
 
-        float I_initial = (800 * 800) + (60 * 60);
-        float I_current = (L * L) + (D * D);
-        float currentOmega = omega0 * (I_initial / I_current);
-
+        float alpha = torqueMag / I;
         float db = (1f / 30f) * w;
-        theta += currentOmega * db;
+
+        omega += alpha * db;
+        theta += omega * db;
 
         float cx = width / 2f;
         float cy = height / 2f;
@@ -76,6 +67,11 @@ public class Rig4 extends PApplet {
         drawPseudo3DCylinder(cx, cy, 12, 0, 200);
         drawPseudo3DBox(cx, cy, theta, L, H, D);
         drawPseudo3DCylinder(cx, cy, 12, -200, 0);
+
+        if (b < pushDurationBeats) {
+            drawVector3D(L / 2f, 0, 0, 0, 0, -180f, theta, cx, cy);
+            drawVector3D(0, -100, 0, 0, -120f, 0, 0, cx, cy);
+        }
 
         popStyle();
     }
@@ -217,6 +213,29 @@ public class Rig4 extends PApplet {
         }
     }
 
+    void drawVector3D(float x0, float y0, float z0, float dx, float dy, float dz, float rotY, float cx, float cy) {
+        P3 p0 = project(x0, y0, z0, rotY, cx, cy);
+        P3 p1 = project(x0 + dx, y0 + dy, z0 + dz, rotY, cx, cy);
+
+        float len = dist(p0.x, p0.y, p1.x, p1.y);
+        if (len < 2) return;
+
+        stroke(255);
+        strokeWeight(3f);
+        line(p0.x, p0.y, p1.x, p1.y);
+
+        float angle = atan2(p1.y - p0.y, p1.x - p0.x);
+        float arrowSize = min(14, len * 0.3f);
+
+        pushMatrix();
+        translate(p1.x, p1.y);
+        rotate(angle);
+        fill(255);
+        noStroke();
+        triangle(0, 0, -arrowSize, -arrowSize * 0.45f, -arrowSize, arrowSize * 0.45f);
+        popMatrix();
+    }
+
     public void settings() {
         fullScreen();
     }
@@ -233,7 +252,7 @@ public class Rig4 extends PApplet {
     }
 
     public static void main(String[] args) {
-        PApplet.main("Classes.Rig4");
+        PApplet.main("Classes.Rig3");
     }
 
     public void mousePressed() {

@@ -66,19 +66,16 @@ public class Ast1 extends PApplet {
 
         float centerY = height * 0.5f;
 
-        // Desplazamiento de la estrella al lado izquierdo (Beats 1.1 -> 1.7)
         float slideProg = constrain(map(beat, 1.1f, 1.7f, 0f, 1f), 0f, 1f);
-        slideProg = slideProg * slideProg * (3f - 2f * slideProg); // Smoothstep
+        slideProg = slideProg * slideProg * (3f - 2f * slideProg);
 
         float coreX = lerp(width * 0.5f, width * 0.28f, slideProg);
 
-        // 1. Nube de Gas y Colapso Exponencial (Beats 0 -> 2)
         float alphaCollapse = constrain(map(beat, 0.0f, 0.2f, 0f, 255f), 0f, 255f);
         if (alphaCollapse > 0) {
             drawGasCloudCollapse(coreX, centerY, t, beat, alphaCollapse);
         }
 
-        // 2. Cajita de Zoom y Ciclo de Fusión Nuclear Protón-Protón (Beats 1.8 -> 4.0)
         float alphaFusion = constrain(map(beat, 1.8f, 2.1f, 0f, 255f), 0f, 255f);
         if (alphaFusion > 0) {
             float zoomX = width * 0.68f;
@@ -96,7 +93,6 @@ public class Ast1 extends PApplet {
         pushMatrix();
         translate(cx, cy);
 
-        // Colapso acelerado (cúbico)
         float rawProg = constrain(map(beat, 0.0f, 1.3f, 0f, 1f), 0f, 1f);
         float collapseProgress = rawProg * rawProg * rawProg;
 
@@ -176,7 +172,7 @@ public class Ast1 extends PApplet {
         clip(zx - zSize * 0.5f + 4f, zy - zSize * 0.5f + 4f, zSize - 8f, zSize - 8f);
         translate(zx, zy);
 
-        float fusionBeat = beat - 2.0f; // Beats 2.0 a 4.0
+        float fusionBeat = beat - 2.0f;
 
         if (fusionBeat < 0.65f) {
             float p1Prog = constrain(map(fusionBeat, 0.0f, 0.45f, 0f, 1f), 0f, 1f);

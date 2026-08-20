@@ -50,7 +50,7 @@ public class Rel1 extends PApplet {
 
     @Override
     public void draw() {
-        background(0); // Fondo negro para la serie de Relatividad
+        background(0);
 
         if (startTimeSec < 0) {
             startTimeSec = millis() * 0.001f;
@@ -60,7 +60,6 @@ public class Rel1 extends PApplet {
         globalTime = timeSec % (BEAT_DURATION * TOTAL_BEATS);
         float currentBeat = globalTime / BEAT_DURATION;
 
-        // Pulso sincronizado exactamente a 100 BPM
         float b = timeSec * (100f / 60f);
         transY = b % 1f;
         logoTransparency = (float) (255 * (-Math.pow(transY, 2) + 2 * (transY)));
@@ -79,7 +78,6 @@ public class Rel1 extends PApplet {
     }
 
     private void drawQuestionStage(float cx, float cy, int questionIndex, float progress, float timeSec) {
-        // Transiciones eliminadas: posición fija al centro y opacidad máxima constante
         float currentX = cx;
         float stageAlpha = 255;
 
@@ -99,7 +97,6 @@ public class Rel1 extends PApplet {
         pushMatrix();
         clip(x, y, w, h);
 
-        // Área reservada para el gráfico a la izquierda
         float graphWidth = w * 0.22f;
         float sceneStartX = x + graphWidth + 40f;
         float sceneWidth = w - (graphWidth + 40f);
@@ -107,7 +104,6 @@ public class Rel1 extends PApplet {
         float centerAnimX = sceneStartX + sceneWidth * 0.55f;
         float centerAnimY = y + h * 0.50f;
 
-        // Tamaños exactos
         float sunR = 250f;
         float earthR = 40f;
         float moonR = 20f;
@@ -116,7 +112,6 @@ public class Rel1 extends PApplet {
         float D = sceneWidth * 0.35f;
         float travelProgress = constrain(map(progress, 0.1f, 0.8f, 0f, 1f), 0f, 1f);
 
-        // Trayectoria: primero el vacío (0 a 0.4), luego penetra la atmósfera (0.4 a 1.0)
         float offset;
         if (travelProgress < 0.4f) {
             float t1 = travelProgress / 0.4f;
@@ -126,7 +121,6 @@ public class Rel1 extends PApplet {
             offset = lerp(0f, -atmosR * 0.75f, t2);
         }
 
-        // Velocidad beta
         float betaVal;
         if (travelProgress < 0.4f) {
             betaVal = 0.998f;
@@ -135,11 +129,9 @@ public class Rel1 extends PApplet {
             betaVal = lerp(0.998f, 0.15f, atmosPenetration);
         }
 
-        // Posición del Muón
         float muonX = centerAnimX;
         float muonY = centerAnimY;
 
-        // Movimiento del resto del mundo hacia la izquierda
         float atmosImpactX = centerAnimX + offset;
         float earthX = atmosImpactX + atmosR;
         float moonX = earthX + 300f;
@@ -147,28 +139,22 @@ public class Rel1 extends PApplet {
         float sunX = (centerAnimX - sunR) - travelProgress * D * 1.3f;
         float bodyY = centerAnimY;
 
-        // --- 1. RENDERING DE LA ESCENA ESPACIAL ---
-
-        // Sol
         fill(255, alpha * 0.15f);
         noStroke();
         ellipse(sunX, bodyY, sunR * 2.15f, sunR * 2.15f);
         fill(255, alpha);
         ellipse(sunX, bodyY, sunR * 2, sunR * 2);
 
-        // Tierra
         stroke(255, alpha * 0.9f);
         strokeWeight(2.5f);
         fill(0);
         ellipse(earthX, bodyY, earthR * 2, earthR * 2);
 
-        // Luna
         stroke(255, alpha * 0.8f);
         strokeWeight(1.5f);
         fill(40, alpha * 0.8f);
         ellipse(moonX, moonY, moonR * 2, moonR * 2);
 
-        // Atmósfera Terrestre
         noStroke();
         fill(200, 220, 255, alpha * 0.12f);
         ellipse(earthX, bodyY, atmosR * 2.08f, atmosR * 2.08f);
@@ -179,12 +165,10 @@ public class Rel1 extends PApplet {
         strokeWeight(1.5f);
         drawDashedArc(earthX, bodyY, atmosR * 2, alpha);
 
-        // Línea de trayectoria
         stroke(255, alpha * 0.25f);
         strokeWeight(1.5f);
         line(sunX + sunR, bodyY, atmosImpactX, bodyY);
 
-        // Muón y Desintegración
         if (travelProgress < 1.0f) {
             float lineStart = max(sunX + sunR, muonX - 60f);
             stroke(255, alpha * 0.8f);
@@ -210,7 +194,6 @@ public class Rel1 extends PApplet {
                 }
             }
 
-            // Electrón (e⁻)
             float eX = muonX + cos(-THIRD_PI) * spread;
             float eY = muonY + sin(-THIRD_PI) * spread;
             stroke(255, alpha * 0.85f);
@@ -219,7 +202,6 @@ public class Rel1 extends PApplet {
             fill(255, alpha);
             ellipse(eX, eY, 8, 8);
 
-            // Neutrino Muónico (ν_μ)
             float nuMuX = muonX + spread;
             float nuMuY = muonY;
             stroke(255, alpha * 0.5f);
@@ -228,7 +210,6 @@ public class Rel1 extends PApplet {
             fill(255, alpha * 0.7f);
             ellipse(nuMuX, nuMuY, 6, 6);
 
-            // Antineutrino Electrónico (ν̄_e)
             float nuEX = muonX + cos(THIRD_PI) * spread;
             float nuEY = muonY + sin(THIRD_PI) * spread;
             stroke(255, alpha * 0.5f);
@@ -238,12 +219,10 @@ public class Rel1 extends PApplet {
             ellipse(nuEX, nuEY, 6, 6);
         }
 
-        // --- 2. MÁSCARA NEGRA PARA EL GRÁFICO ---
         noStroke();
         fill(0);
         rect(x, y - 10, graphWidth + 35f, h + 20);
 
-        // --- 3. DIBUJO DEL GRÁFICO GAMMA ---
         drawGammaGraph(x + 10f, y + 35f, graphWidth, h * 0.78f, alpha, betaVal);
 
         noClip();

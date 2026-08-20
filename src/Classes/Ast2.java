@@ -37,7 +37,6 @@ public class Ast2 extends PApplet {
         noCursor();
         startTimeSec = millis() * 0.001f;
 
-        // Manteniendo exactamente las dimensiones y posicionamiento original del Elogo
         float finalX = (width / 2f) + 865.3f;
         float finalY = (height / 2f) - 458.1f;
         float finalW = (height / 2f) - 381.75f;
@@ -77,7 +76,6 @@ public class Ast2 extends PApplet {
         float rawProg = constrain(map(beat, 0.2f, 3.6f, 0f, 1f), 0f, 1f);
         float prog = rawProg * rawProg * (3f - 2f * rawProg);
 
-        // Ubicación exacta de la estrella e interfaz
         float starX = width * 0.27f;
         float starY = height * 0.5f;
         drawEvolvingStar(starX, starY, prog, t);

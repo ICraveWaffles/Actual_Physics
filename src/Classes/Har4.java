@@ -52,12 +52,12 @@ public class Har4 extends PApplet {
 
         float numQuartersString = nString * 2f;
 
-        stroke(200, 150, 100, 150);
+        stroke(200,150);
         strokeWeight(6);
         noFill();
         drawStandingWave(startX, endX, stringY0, ampString, numQuartersString, shmFreq * b, true);
 
-        stroke(220, 180, 140);
+        stroke(255);
         strokeWeight(2);
         drawStandingWave(startX, endX, stringY0, ampString, numQuartersString, shmFreq * b, false);
 
@@ -83,7 +83,7 @@ public class Har4 extends PApplet {
         strokeWeight(1);
         line(startX, tubeY0, endX, tubeY0);
 
-        stroke(100, 220, 255);
+        stroke(255);
         strokeWeight(3);
         noFill();
         drawStandingWave(startX, endX, tubeY0, ampTube, numQuartersTube, shmFreq * b, false);
@@ -150,8 +150,6 @@ public class Har4 extends PApplet {
     }
 
     int markerColor(String type) {
-        if (type.equals("N")) return color(255, 80, 80);
-        if (type.equals("A")) return color(80, 255, 80);
         return color(255);
     }
 
